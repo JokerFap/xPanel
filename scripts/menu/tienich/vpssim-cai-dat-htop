@@ -1,0 +1,24 @@
+#!/bin/bash 
+. /home/vpssim.conf
+if [ -f /usr/bin/htop ]; then
+clear
+echo "========================================================================= "
+echo "HTOP was installed  "
+echo "-------------------------------------------------------------------------"
+echo "Run HTOP by using command: htop "
+/etc/vpssim/menu/vpssim-tien-ich
+else
+echo "========================================================================= "
+echo "install Htop..."
+sleep 3
+wget http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
+rpm -ihv rpmforge-release*.rf.x86_64.rpm
+yum -y install htop
+clear
+echo "========================================================================= "
+echo "Successfully installed HTOP "
+echo "-------------------------------------------------------------------------"
+echo "Run HTOP by using command: htop "
+/etc/vpssim/menu/vpssim-tien-ich
+fi
+exit

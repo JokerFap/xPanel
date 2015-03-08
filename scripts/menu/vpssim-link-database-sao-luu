@@ -1,0 +1,47 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "========================================================================="
+echo -n "Type in the database name [ENTER]: " 
+read databasename
+if [ "$databasename" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please fill accurately."
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if [ ! -f /var/lib/mysql/$databasename/db.opt ]; then
+clear
+echo "========================================================================="
+echo "Sorry, we can not find out $databasename  !"
+echo "-------------------------------------------------------------------------"
+echo "Please check again!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+
+if [ ! -f  /home/$mainsite/private_html/backup/$databasename/*.tar.gz ]; then
+clear
+echo "========================================================================="
+echo "Database $databasename do not have any backup !"
+echo "-------------------------------------------------------------------------"
+echo "Please check again!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+else
+find /home/$mainsite/private_html/backup/$databasename/ -type f -exec basename {} \;  > /tmp/linkdatabasename
+filename=`cat /tmp/linkdatabasename`
+echo "Please wait..."
+sleep 2
+clear
+echo "========================================================================="
+echo "Discovered backup for $databasename on server"
+echo "-------------------------------------------------------------------------"
+echo "Link download backup: "
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/$databasename/$filename"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/$databasename/$filename"
+rm -rf /tmp/linkdatabasename
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi

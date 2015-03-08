@@ -1,0 +1,24 @@
+#!/bin/sh
+. /home/vpssim.conf
+prompt="Type in your choice:"
+options=("Add Park Domain" "Add Redirect Domain" "Exit")
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM              \n"
+printf "=========================================================================\n"
+printf "                      Add Park & Redirect Domain                 \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in   
+    1) /etc/vpssim/menu/vpssim-park-domain;;
+    2) /etc/vpssim/menu/vpssim-redirect-domain;;  
+    3) clear && /bin/vpssim;;  
+    *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+
+ 

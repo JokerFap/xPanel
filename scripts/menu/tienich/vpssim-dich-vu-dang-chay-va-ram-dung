@@ -1,0 +1,42 @@
+#!/bin/bash
+. /home/vpssim.conf
+if [ ! -d "/home/$mainsite/private_html/ramuse" ]; then
+mkdir -p /home/$mainsite/private_html/ramuse
+fi
+echo "========================================================================= "
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read abcd
+if [ "$abcd" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately "
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi
+
+if [[ ! ${#abcd} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your files more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi 
+echo "Please wait..."
+if [ ! -f "/home/$mainsite/private_html/ramuse/vpssim-$abcd.txt" ]; then
+rm -r -f /home/$mainsite/private_html/ramuse/vpssim-$abcd.txt
+fi
+sleep 2
+cd /etc/vpssim/menu/tienich
+./vpssim-tien-trinh-dang-chay-ram-use > /home/$mainsite/private_html/ramuse/vpssim-$abcd.txt
+cd
+sed -i '1s/^/List Service running and RAM useage \n\n\n/' /home/$mainsite/private_html/ramuse/vpssim-$abcd.txt
+clear
+echo "========================================================================= "
+echo "Link view Services running & Ram useage:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/ramuse/vpssim-$abcd.txt"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/ramuse/vpssim-$abcd.txt"
+/etc/vpssim/menu/vpssim-tien-ich

@@ -1,0 +1,36 @@
+#!/bin/bash
+if [ -f /swapfile ]; then
+echo "========================================================================="
+read -r -p "You want to delete Swap on VPS ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "Prepare to delete SWAP... "
+sleep 2
+swapoff /swapfile
+rm -rf /swapfile
+clear
+echo "========================================================================= "
+echo "You deleted SWAP successfully.  "
+echo "-------------------------------------------------------------------------"
+echo "Now you can create a new SWAP "
+/etc/vpssim/menu/swap/vpssim-them-swap-menu
+
+;;
+    *)
+       clear
+echo "========================================================================= "
+echo "You cancle delete SWAP."
+/etc/vpssim/menu/swap/vpssim-them-swap-menu
+        ;;
+esac
+clear
+/etc/vpssim/menu/swap/vpssim-them-swap-menu
+else
+clear
+echo "========================================================================= "
+echo "You haven't created swap yet !"
+echo "-------------------------------------------------------------------------"
+echo "Or this VPS don't support create SWAP more."
+/etc/vpssim/menu/swap/vpssim-them-swap-menu
+exit
+fi

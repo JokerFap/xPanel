@@ -1,0 +1,37 @@
+#!/bin/bash
+prompt="Type in your choice (14-Exit):"
+options=( "Add Website + Wordpress" "Add Website + Textpattern" "Add Website + Serendipity " "Add Website + Pligg-CMS " "Add Website + Pivotx" "Add Website + PHP-NUKE" "Add Website + Nibbleblog" "Add Website + Lifetype" "Add Website + Joomla" "Add Website + Drupal 7 " "Add Website + Drupal 6" "Add Website + Chyrp" "Add Website + B2evolution" "Exit")
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                      Add Website + Code Blog \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+
+1) rm -r -f website-wp && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-wp && chmod +x website-wp && clear &&./website-wp;;
+2) rm -r -f website-textpattern && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-textpattern && chmod +x website-textpattern && clear &&./website-textpattern;;
+3) rm -r -f website-serendipity && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-serendipity && chmod +x website-serendipity && clear &&./website-serendipity;;
+4) rm -r -f website-Pligg-cms && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-Pligg-cms && chmod +x website-Pligg-cms && clear &&./website-Pligg-cms;;
+5) rm -r -f website-pivotx && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-pivotx && chmod +x website-pivotx && clear &&./website-pivotx;;
+6) rm -r -f website-PHP-NUKE && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-PHP-NUKE && chmod +x website-PHP-NUKE && clear &&./website-PHP-NUKE;;
+7) rm -r -f website-nibbleblog && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-nibbleblog && chmod +x website-nibbleblog && clear &&./website-nibbleblog;;
+8) rm -r -f website-lifetype && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-lifetype && chmod +x website-lifetype && clear &&./website-lifetype;;
+9) rm -r -f website-joomla && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-joomla && chmod +x website-joomla && clear &&./website-joomla;;
+10) rm -r -f website-drupal7 && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-drupal7 && chmod +x website-drupal7 && clear &&./website-drupal7;;
+11) rm -r -f website-drupal6 && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-drupal6 && chmod +x website-drupal6 && clear &&./website-drupal6;;
+12) rm -r -f website-chyrp && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-chyrp && chmod +x website-chyrp && clear &&./website-chyrp;;
+13) rm -r -f website-b2evolution && wget -q http://vpssim.com/script/vpssim/addon/website/blog/website-b2evolution && chmod +x website-b2evolution && clear &&./website-b2evolution;;
+14) clear && /etc/vpssim/menu/vpssim-them-website-menu;;
+        *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+
+
+

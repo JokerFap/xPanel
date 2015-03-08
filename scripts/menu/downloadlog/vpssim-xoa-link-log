@@ -1,0 +1,18 @@
+#!/bin/sh
+. /home/vpssim.conf
+rm -r -f /home/$mainsite/private_html/nginx.log.zip
+rm -r -f /home/$mainsite/private_html/log-boot.log.zip
+rm -r -f /home/$mainsite/private_html/log-cronjob.log.zip
+rm -r -f /home/$mainsite/private_html/log-secure.log.zip
+rm -r -f /home/$mainsite/private_html/php-fpm.log.zip
+rm -r -f /home/$mainsite/private_html/php-fpm-slow.log.zip
+rm -r -f /home/$mainsite/private_html/mysql.log.zip
+rm -r -f /home/$mainsite/private_html/mysql-slow.log.zip
+echo "Please wait..."
+sleep 2
+clear
+echo "========================================================================= "
+echo "You have finished delete all LOG download link "
+/etc/vpssim/menu/vpssim-eroor-menu
+
+

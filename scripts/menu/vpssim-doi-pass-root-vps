@@ -1,0 +1,20 @@
+#!/bin/bash 
+echo "========================================================================= "
+read -r -p "You want to change password for user root? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+sleep 1
+echo "-------------------------------------------------------------------------"
+passwd
+clear
+clear
+echo "========================================================================= "
+
+echo "You changed password successfully for root"
+/etc/vpssim/menu/vpssim-tien-ich
+;;
+esac
+clear
+echo "========================================================================="
+echo "You cancel change password user root!!!"
+/etc/vpssim/menu/vpssim-tien-ich

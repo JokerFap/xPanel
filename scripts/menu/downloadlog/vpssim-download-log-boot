@@ -1,0 +1,20 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "Please wait...."
+sleep 2
+rm -r -f /home/$mainsite/private_html/log-boot.log.zip
+\cp -uf /var/log/boot.log /home/$mainsite/private_html/
+cd /home/$mainsite/private_html/
+zip log-boot.log.zip boot.log
+rm -r -f boot.log
+cd
+clear
+echo "========================================================================= "
+echo "Link download Log BOOT:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/log-boot.log.zip"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/log-boot.log.zip"
+
+/etc/vpssim/menu/vpssim-eroor-menu
+

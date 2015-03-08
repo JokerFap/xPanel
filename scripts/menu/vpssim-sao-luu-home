@@ -1,0 +1,60 @@
+#!/bin/sh
+. /home/vpssim.conf
+echo "========================================================================="
+printf "A full backup of your home directory may take time \n"
+printf "and hard disk space to store the backup file. \n"
+echo "-------------------------------------------------------------------------"
+read -r -p "You definitely want to backup all sites ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    echo "-------------------------------------------------------------------------"
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read backuphomename
+if [ "$backuphomename" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi
+if [[ ! ${#backuphomename} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your backup more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi  
+echo "-------------------------------------------------------------------------"
+echo "We are backing up VPS's folder Home ..... "
+sleep 3
+rm -rf /home/$mainsite/private_html/backup/home/*
+cd /usr/local
+zip -r $serverip-$backuphomename.zip /home
+mkdir -p /home/$mainsite/private_html/backup/home
+mv $serverip-$backuphomename.zip /home/$mainsite/private_html/backup/home/$serverip-$backuphomename.zip
+clear
+echo "========================================================================="
+echo "Link file backup:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/home/$serverip-$backuphomename.zip"
+echo "-------------------------------------------------------------------------"
+echo "if $mainsite use cloudflare, use this link:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/home/$serverip-$backuphomename.zip"
+
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+
+ ;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+echo "========================================================================="
+echo "Cancel create backup file."
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi

@@ -1,0 +1,25 @@
+#!/bin/bash
+. /home/vpssim.conf
+if [ -f /home/$mainsite/private_html/backup/home/*.zip ]; then
+find /home/$mainsite/private_html/backup/home/ -type f -exec basename {} \;  > /etc/vpssim/linkbackup
+filename=`cat /etc/vpssim/linkbackup`
+echo "Please wait..."
+sleep 2
+clear
+echo "========================================================================="
+echo "Discovered the backup of all website on server"
+echo "-------------------------------------------------------------------------"
+echo "Link download backup: "
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/home/$filename"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/home/$filename"
+/etc/vpssim/menu/vpssim-sao-luu
+rm -rf /etc/vpssim/linkbackup
+else
+clear
+echo "========================================================================="
+echo "You did not create the backup for all website yet!"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi

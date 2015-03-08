@@ -1,0 +1,44 @@
+#!/bin/sh
+. /home/vpssim.conf
+echo "========================================================================="
+echo -n "Type in the domain you want to check [ENTER]: " 
+read website
+if [ "$website" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please type in accurately!"
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,6}$";
+if [[ ! "$website" =~ $kiemtradomain3 ]]; then
+	website=`echo $website | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$website maybe not a domain name!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi
+
+if [ "$(host -t a $website | awk 'NR==1 {print $3}')" == "address" ]; then
+clear
+echo "========================================================================="
+echo "IP $website: $(host -t a $website | awk 'NR==1 {print $4}')"
+echo "-------------------------------------------------------------------------"
+echo "$website Nameserver:"
+echo "-------------------------------------------------------------------------"
+host -t ns $website
+/etc/vpssim/menu/vpssim-tien-ich
+else
+clear
+echo "========================================================================="
+echo "Maybe domain $website you typed in"
+echo "-------------------------------------------------------------------------"
+echo "Do not point to any IP or not registered "
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi
+

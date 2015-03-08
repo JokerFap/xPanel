@@ -1,0 +1,46 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+echo "========================================================================="
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read backupsys
+if [ "$backupsys" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi
+if [[ ! ${#backupsys} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your backup more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi  
+mkdir -p /usr/local/backup-system
+cp -r /etc/nginx /usr/local/backup-system/
+\cp -uf /etc/my.cnf.d/server.cnf /usr/local/backup-system/
+\cp -uf /etc/php.ini /usr/local/backup-system/
+\cp -uf /etc/php-fpm.conf /usr/local/backup-system/
+cp -r /etc/php-fpm.d/www.conf /usr/local/backup-system/
+cd /usr/local/backup-system/
+zip -r backupsys-$backupsys.zip *
+mkdir -p /home/$mainsite/private_html/backup/backup-sys
+mv backupsys-$backupsys.zip /home/$mainsite/private_html/backup/backup-sys/backupsys-$backupsys.zip
+cd
+rm -rf /usr/local/backup-system
+clear
+echo "========================================================================="
+echo "Link file backup:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/backup-sys/backupsys-$backupsys.zip"
+echo "-------------------------------------------------------------------------"
+echo "if $mainsite use cloudflare, use this link:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/backup-sys/backupsys-$backupsys.zip"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi

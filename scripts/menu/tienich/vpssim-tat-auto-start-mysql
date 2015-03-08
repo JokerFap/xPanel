@@ -1,0 +1,22 @@
+#!/bin/sh
+. /home/vpssim.conf
+echo "========================================================================="
+read -r -p "You want to disable [Auto re-start MySQL Server] ?  [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    crontab -u root -l | grep -v 'auto-start-mysql'  | crontab -u root -
+    echo "Please wait..."
+sleep 2
+    clear
+    echo "========================================================================="
+echo "Disable [Auto re-start MySQL Server] successfully !"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+    *)
+       clear
+    echo "========================================================================="
+   echo "You cancel disable [Auto re-start MySQL Server]"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+esac
+

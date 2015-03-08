@@ -1,0 +1,37 @@
+#!/bin/sh
+
+. /home/vpssim.conf
+echo -n "Type in Data you want to turnoff auto backup [ENTER]: " 
+read dataname
+if [ ! -f /var/lib/mysql/$dataname/db.opt ]; then
+clear
+echo "========================================================================="
+echo "Did not find out database: $dataname on server"
+echo "-------------------------------------------------------------------------"
+echo "please check again!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if [ -f /bin/vpssim-backupdb-$dataname ]; then
+echo "Discover data $dataname on auto backup list"
+echo "starting remove data from the auto backup list..."
+sleep 2
+rm -rf /bin/vpssim-backupdb-$dataname
+cat > "/tmp/removebackupdb" <<END
+sed --in-place '/vpssim-backupdb-$dataname/d' /etc/cron.d/vpssim.db.cron
+END
+chmod +x /tmp/removebackupdb
+/tmp/removebackupdb 
+rm -rf /tmp/removebackupdb
+service crond restart
+clear
+echo "========================================================================="
+echo "Turnoff auto backup $dataname successful."
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+else
+clear
+echo "========================================================================="
+echo "Did not find out $dataname on auto backup list"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi

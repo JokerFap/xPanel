@@ -1,0 +1,13 @@
+#!/bin/sh
+. /home/vpssim.conf
+if [ -f /etc/php.d/opcache.ini ]; then
+/etc/vpssim/menu/opcache/vpssim-dang-bat-opcache-menu
+fi
+if [ -f /etc/php.d/opcache.bak ]; then
+/etc/vpssim/menu/opcache/vpssim-dang-tat-opcache-menu
+fi
+clear
+echo "========================================================================="
+echo "VPSSIM can not find zend opcache in your system"
+vpssim
+fi

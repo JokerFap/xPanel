@@ -1,0 +1,80 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+
+if [ -f /etc/php.d/ioncube.ini ]; then
+echo "========================================================================="
+echo "Ioncube Loader is installed in your VPS !"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to remove it ?  [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    echo "Please wait..."
+    sleep 2
+    
+rm -r -f /etc/php.d/*.ioncube.*
+rm -r -f /etc/php.d/ioncube.*
+rm -r -f /usr/local/ioncube
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+else
+systemctl restart php-fpm.service
+fi
+clear
+echo "========================================================================="
+
+	echo "Uninstall Ioncube Loader successfully !"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+    *)
+       clear
+    echo "========================================================================="
+   echo "You cancel remove Ioncube Loader"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+esac
+exit
+fi
+echo "========================================================================="
+echo "Ioncube Loader is not installed !"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to install it ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+		echo "Please wait..."
+		sleep 2
+	php_version=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
+	arch=`uname -m`
+if [ "$arch" = "x86_64" ]; then
+wget -q -O - http://downloads2.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz | tar -xzf - -C /usr/local
+rm -r -f /root/ioncube_loaders_lin_x86-64.tar.gz
+rm -r -f /etc/php.d/*.ioncube.*
+rm -r -f /etc/php.d/ioncube.*
+else
+wget -q -O - http://downloads2.ioncube.com/loader_downloads/ioncube_loaders_lin_x86.tar.gz | tar -xzf - -C /usr/local
+rm -r -f /root/ioncube_loaders_lin_x86.tar.gz
+rm -r -f /etc/php.d/*.ioncube.*
+rm -r -f /etc/php.d/ioncube.*
+fi
+cat > "/etc/php.d/ioncube.ini" <<END
+zend_extension=/usr/local/ioncube/ioncube_loader_lin_${php_version}.so
+END
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+else
+systemctl restart php-fpm.service
+fi
+clear
+echo "========================================================================="
+echo "You have finished install Ioncube Loader"
+/etc/vpssim/menu/vpssim-tien-ich
+       ;;
+    *)
+    clear
+    echo "========================================================================="
+   echo "You cancel install Ioncube Loader"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+esac
+exit
+fi

@@ -1,0 +1,21 @@
+#!/bin/sh
+. /home/vpssim.conf
+
+if [ ! -f /var/spool/cron/root ]; then
+/etc/vpssim/menu/tienich/vpssim-bat-auto-start-mysql
+exit
+fi
+
+if [ "$(grep "auto-start-mysql" /var/spool/cron/root | awk '{print $6}')" == "auto-start-mysql" ]; then
+/etc/vpssim/menu/tienich/vpssim-tat-auto-start-mysql
+exit
+fi
+if [ "$(grep "auto-start-mysql" /var/spool/cron/root | awk '{print $6}')" == "" ]; then
+/etc/vpssim/menu/tienich/vpssim-bat-auto-start-mysql
+exit
+fi
+clear
+echo "we can find cronjob for you"
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi

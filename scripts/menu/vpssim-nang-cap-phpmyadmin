@@ -1,0 +1,70 @@
+#!/bin/bash
+if [ ! -f /etc/vpssim/phpmyadmin.version ]; then
+wget -q http://vpssim.com/script/vpssim/phpmyadmin-nangcap/phpmyadmin.newversion -O /etc/phpmyadmin.newversion && chmod 777 /etc/phpmyadmin.newversion
+REMOVER=`cat /etc/vpssim/phpmyadmin.newversion`
+echo "========================================================================="
+echo "Phpmyadmin update Discovered"
+echo "-------------------------------------------------------------------------"
+echo "The current version on your VPS is: Unknown"
+echo "-------------------------------------------------------------------------"
+echo "The version on the air:  $REMOVER"
+echo "========================================================================="
+echo "Prepare to update Phpmyadmin..... "
+sleep 2
+rm -r -f /etc/vpssim/phpmyadmin.newversion
+rm -f /etc/vpssim/vpssim-nang-cap-phpmyadmin-server
+wget -q http://vpssim.com/script/vpssim/phpmyadmin-nangcap/vpssim-nang-cap-phpmyadmin-server -O /etc/vpssim/vpssim-nang-cap-phpmyadmin-server && chmod +x /etc/vpssim/vpssim-nang-cap-phpmyadmin-server
+/etc/vpssim/vpssim-nang-cap-phpmyadmin-server
+fi
+
+wget -q http://vpssim.com/script/vpssim/phpmyadmin-nangcap/phpmyadmin.newversion -O /etc/vpssim/phpmyadmin.newversion && chmod 777 /etc/vpssim/phpmyadmin.newversion
+LOCALVER=`cat /etc/vpssim/phpmyadmin.version`
+REMOVER=`cat /etc/vpssim/phpmyadmin.newversion`
+
+if [ "$LOCALVER" == "$REMOVER" ]; then
+clear
+rm -r -f /etc/vpssim/phpmyadmin.newversion
+echo "========================================================================="
+echo "The current Phpmyadmin version on your server is:  $LOCALVER"
+echo "-------------------------------------------------------------------------"
+echo "You are using the lastest Phpmyadmin's version"
+/etc/vpssim/menu/vpssim-phpmyadmin-menu
+exit
+fi
+echo "========================================================================="
+echo "Phpmyadmin update discovered"
+echo "-------------------------------------------------------------------------"
+echo "The current version on your VPS is:  $LOCALVER"
+echo "-------------------------------------------------------------------------"
+echo "The version on the air:  $REMOVER"
+echo "========================================================================="
+read -r -p "You want to upgrade Phpmyadmin to lastest version ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "-------------------------------------------------------------------------"
+echo "Prepare to update Phpmyadmin..... "
+sleep 2
+rm -r -f /etc/vpssim/phpmyadmin.newversion
+rm -f /etc/vpssim/vpssim-nang-cap-phpmyadmin-server
+wget -q http://vpssim.com/script/vpssim/phpmyadmin-nangcap/vpssim-nang-cap-phpmyadmin-server -O /etc/vpssim/vpssim-nang-cap-phpmyadmin-server && chmod +x /etc/vpssim/vpssim-nang-cap-phpmyadmin-server
+/etc/vpssim/vpssim-nang-cap-phpmyadmin-server
+
+exit
+
+ ;;
+    *)
+        echo ""
+        ;;
+esac
+clear && /etc/vpssim/menu/vpssim-phpmyadmin-menu
+exit
+fi
+
+
+
+
+
+
+
+
+

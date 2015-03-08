@@ -1,0 +1,29 @@
+#!/bin/sh
+prompt="Type in your choice (8-Exit):"
+options=("Backup code 1 website" "Backup code all website" "Link File backup code 1 website" "Link File backup all website" "Deleted all file Backup" "Backup Config file & Vhost" "Fix Can't download Backup" "Exit")
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                      Backup Code & System Config\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+    1 ) /etc/vpssim/menu/vpssim-sao-luu-code;;
+    2 ) /etc/vpssim/menu/vpssim-sao-luu-home;;
+    3 ) /etc/vpssim/menu/vpssim-link-tai-sao-luu-1-site;;
+    4 ) /etc/vpssim/menu/vpssim-link-tai-sao-luu-tat-ca-cac-site;;
+    5 ) /etc/vpssim/menu/vpssim-xoa-toan-bo-backup;;
+    6 ) /etc/vpssim/menu/vpssim-sao-luu-sys;;
+    7 )  /etc/vpssim/menu/vpssim-khong-the-download-backup;;
+    8 ) clear && /bin/vpssim;;
+    
+    *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+. /home/vpssim.conf
+
+if [ -f /home/$mainsite/logs/mysql.log ]; then
+rm -r -f /home/$mainsite/private_html/mysql.log.zip
+\cp -uf /home/$mainsite/logs/mysql.log /home/$mainsite/private_html
+cd /home/$mainsite/private_html
+zip mysql.log.zip mysql.log
+rm -r -f mysql.log
+cd
+echo "Please wait ..."
+sleep 2
+clear
+echo "========================================================================= "
+echo "Link download Mysql Log:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/mysql.log.zip"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/mysql.log.zip"
+
+
+/etc/vpssim/menu/vpssim-eroor-menu
+exit
+fi
+clear
+echo "========================================================================= "
+echo "Log file does not exist or you disable write logfile."
+/etc/vpssim/menu/vpssim-eroor-menu

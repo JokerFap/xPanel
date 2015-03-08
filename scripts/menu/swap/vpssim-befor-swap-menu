@@ -1,0 +1,14 @@
+#!/bin/sh
+. /home/vpssim.conf
+if [ ! "$(virt-what | awk 'NR==1 {print $1}')" == "openvz" ]; then
+/etc/vpssim/menu/swap/vpssim-them-swap-menu
+else
+clear
+echo "========================================================================="
+echo "Your VPS type: OpenVZ"
+echo "-------------------------------------------------------------------------"
+echo "This function only support VPS KVM & XEN !"
+vpssim
+exit
+fi
+

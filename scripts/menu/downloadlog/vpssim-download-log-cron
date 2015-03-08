@@ -1,0 +1,22 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "Please wait...."
+sleep 2
+rm -r -f /home/$mainsite/private_html/log-cronjob.log.zip
+mkdir -p /home/$mainsite/private_html
+\cp -uf /var/log/cron /home/$mainsite/private_html
+cd /home/$mainsite/private_html
+zip log-cronjob.log.zip cron
+rm -r -f cron
+cd
+clear
+echo "========================================================================= "
+echo "Link download Log CronJob:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/log-cronjob.log.zip"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/log-cronjob.log.zip"
+
+
+/etc/vpssim/menu/vpssim-eroor-menu
+

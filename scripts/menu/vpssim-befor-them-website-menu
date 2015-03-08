@@ -1,0 +1,47 @@
+#!/bin/sh
+. /home/vpssim.conf
+if [ ! -f /home/DBinfo.txt ]; then
+echo "========================================================================="  > /home/DBinfo.txt
+echo "DATABASE INFOMATION"  >> /home/DBinfo.txt
+echo "========================================================================="  >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+fi
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service nginx status | awk 'NR==1 {print $5}')" == "running..." ]; then
+clear
+/etc/vpssim/menu/vpssim-them-website-menu
+exit
+fi
+fi
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl start nginx.service
+if [ "$(/bin/systemctl status  nginx.service| awk 'NR==3 {print $2}')" == "active" ]; then
+clear
+/etc/vpssim/menu/vpssim-them-website-menu
+exit
+fi
+fi
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+clear
+echo "========================================================================="
+echo "Sorry, Nginx is stopped."
+echo "-------------------------------------------------------------------------"
+echo "Please start it before use this function !"
+vpssim
+exit
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+clear
+echo "========================================================================="
+echo "Sorry, Nginx is stopped. Please start it before use this function !"
+echo "-------------------------------------------------------------------------"
+echo "You can start Nginx by Command [ service nginx start ]"
+vpssim
+exit
+fi

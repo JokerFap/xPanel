@@ -1,0 +1,60 @@
+#!/bin/sh
+. /home/vpssim.conf
+prompt="Type in your choice (11-Exit):"
+if [ -f /etc/csf/csf.conf ]; then
+options=("Block IP" "Unblock IP" "Unblock all IP" "Add IP to CSF.Allow" "Remove IP from CSF.Allow" "Restart (Enable) CSF firewall" "Disable CSF firewall" "Remove CSF firewall" "View IP blocked List" "Update CSF Firewall"  "Exit")
+else
+options=("Block IP" "Unblock IP" "Unblock all IP" "Add IP to CSF.Allow" "Remove IP from CSF.Allow" "Restart (Enable) CSF firewall" "Disable CSF firewall" "Remove CSF firewall" "View IP blocked List" "Install CSF Firewall"  "Exit")
+fi
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM                \n"
+printf "=========================================================================\n"
+printf "                        CSF Firewall Manage                                \n"
+printf "=========================================================================\n"
+if [ ! -f "/etc/csf/csf.conf" ]; then
+printf "                    CSF Firewall: Not installed\n"
+else
+test_csf=$(csf -v | awk 'NR==1 {print $NF}')
+if [ ! "$test_csf" == "enable" ]; then
+
+printf "                CSF Firewall: Running - Version:  $(csf -v | awk 'NR==1 {print $2}')\n"
+else
+printf "                 CSF Firewall: Installed but disabled\n"
+fi
+fi
+if [ -f /etc/csf/csf.deny ]; then
+if [ "$(cat /etc/csf/csf.deny | awk 'NR==2 {print $2}')" == "Copyright" ]; then
+rm -r -f /etc/csf/csf.deny
+cat > "/etc/csf/csf.deny" <<END
+END
+fi
+fi
+if [ -f "/etc/csf/csf.conf" ]; then
+if [ ! -f /etc/csf/csf.deny ]; then
+cat > "/etc/csf/csf.deny" <<END
+END
+fi
+fi
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+    1) /etc/vpssim/menu/CSF-Fiwall/vpssim-chan-ip-ddos;;
+    2) /etc/vpssim/menu/CSF-Fiwall/vpssim-bo-chan-ip;;
+    3) /etc/vpssim/menu/CSF-Fiwall/vpssim-bo-chan-tat-ca-ip;;
+    4) /etc/vpssim/menu/CSF-Fiwall/vpssim-csf-allow;;
+    5) /etc/vpssim/menu/CSF-Fiwall/vpssim-remove-ip-khoi-csf-allow;;
+    6) /etc/vpssim/menu/CSF-Fiwall/vpssim-restart-csf;;
+    7) /etc/vpssim/menu/CSF-Fiwall/vpssim-befor-tat-csf;;
+    8) /etc/vpssim/menu/CSF-Fiwall/vpssim-xoa-csf;;
+    9) /etc/vpssim/menu/CSF-Fiwall/vpssim-download-csf-denny;;
+    10) /etc/vpssim/menu/CSF-Fiwall/vpssim-cai-dat-csf-csf-before;;
+    11) clear && vpssim;;  
+    *) echo "You typed wrong, please type in the ordinal number on the list";continue;;
+
+    esac
+done
+ 

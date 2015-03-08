@@ -1,0 +1,62 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+echo "========================================================================="
+echo "This function create list largest 20 files and directories in /home "
+echo "-------------------------------------------------------------------------"
+read -r -p "You want to find the largest 20 files and directories ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    echo "-------------------------------------------------------------------------"
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read topfilesizeaz
+if [ "$topfilesizeaz" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi
+
+if [[ ! ${#topfilesizeaz} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your list files more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi  
+echo "-------------------------------------------------------------------------"
+	echo "Please wait.... The old list file will be deleted !"
+	sleep 2
+	rm -r -f /home/$mainsite/private_html/top20/*.*
+	mkdir -p /home/$mainsite/private_html/top20
+	cd /home/
+	find . -type f -print0 | xargs -0 du | sort -n | tail -20 | cut -f2 | xargs -I{} du -sh {} > /home/$mainsite/private_html/top20/$topfilesizeaz-top20file.txt
+    find . -type d -print0 | xargs -0 du | sort -n | tail -20 | cut -f2 | xargs -I{} du -sh {} > /home/$mainsite/private_html/top20/$topfilesizeaz-top20folder.txt
+    sed -i '1s/^/List 20 largest files created by VPSSIM \n\n/' /home/$mainsite/private_html/top20/$topfilesizeaz-top20file.txt
+    sed -i '1s/^/List 20 largest directories created by VPSSIM \n\n/' /home/$mainsite/private_html/top20/$topfilesizeaz-top20folder.txt
+cd
+clear
+echo "========================================================================="
+echo "Link to view 20 largest files:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/top20/$topfilesizeaz-top20file.txt"
+echo "-------------------------------------------------------------------------"
+echo "Link to view 20 largest directories:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/top20/$topfilesizeaz-top20folder.txt"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+clear
+echo "========================================================================="
+echo "Cancel CREATE list largest 20 files and directories."
+/etc/vpssim/menu/vpssim-tien-ich
+exit
+fi

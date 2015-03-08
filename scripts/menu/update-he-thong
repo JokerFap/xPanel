@@ -1,0 +1,55 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+php_version=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
+echo "========================================================================="
+echo "This function will update Centos system, MariaDB and PHP-FPM."
+echo "-------------------------------------------------------------------------"
+echo "Last recent update on: $(sed -n '/Updated:/h;${;g;p;}' < /var/log/yum.log | awk '{print $1,$2,$3}') "
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to update? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "Prepare to update ..... "
+sleep 2
+yum -y update
+yum -y upgrade
+if [ "$php_version" == "5.4" ]; then
+yum -y --enablerepo=remi,remi-php54 upgrade php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+clear
+echo "========================================================================="
+echo "Update done !"
+/etc/vpssim/menu/tienich/vpssim-update-service
+fi
+
+if [ "$php_version" == "5.5" ]; then
+yum -y --enablerepo=remi,remi-php55 upgrade php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+clear
+echo "========================================================================="
+echo "Update done !"
+/etc/vpssim/menu/tienich/vpssim-update-service
+fi
+
+if [ "$php_version" == "5.6" ]; then
+yum -y --enablerepo=remi,remi-php56 upgrade php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+clear
+echo "========================================================================="
+echo "Update done !"
+/etc/vpssim/menu/tienich/vpssim-update-service
+fi
+
+clear
+echo "========================================================================="
+echo "Sorry, VPSSIM can not check your PHP version"
+echo "Everthing updated but PHP"
+echo "Bye !"
+vpssim
+
+;;
+esac
+clear
+echo "========================================================================="
+echo "You cancel update Centos system, MariaDB and PHP-FPM !"
+/etc/vpssim/menu/tienich/vpssim-update-service
+exit
+fi

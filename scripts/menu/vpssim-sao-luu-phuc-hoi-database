@@ -1,0 +1,29 @@
+#!/bin/sh
+prompt="Type in your choice (8-Exit):"
+options=("Backup Database" "Auto Backup Database" "TurnOff Auto backup Database" "Get link backup files" "Restore Database (File backup with format .SQL)" "Restore Database (File backup with format .TAR.GZ)" "Fix Can't download Backup" "Exit")
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                      Backup & Restore Database\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+    1 ) /etc/vpssim/menu/vpssim-sao-luu-data;;
+    2 ) /etc/vpssim/menu/vpssim-tu-dong-sao-luu;;
+    3 ) /etc/vpssim/menu/vpssim-tat-tu-dong-sao-luu;;
+    4) /etc/vpssim/menu/vpssim-link-database-sao-luu;;
+    5 ) /etc/vpssim/menu/vpssim-phuc-hoi-database-sql;;
+    6 ) /etc/vpssim/menu/vpssim-phuc-hoi-database-tar-gz;;
+    7 ) /etc/vpssim/menu/vpssim-khong-the-download-backup-database;;
+    8 ) clear && /etc/vpssim/menu/vpssim-them-xoa-database;;
+
+    
+    *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done

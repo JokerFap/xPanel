@@ -1,0 +1,6 @@
+#!/bin/bash
+touch /var/cache/ngx_pagespeed/cache.flush
+clear
+echo "========================================================================= "
+echo "Successfully clear Pagespeed cache"
+/etc/vpssim/menu/pagespeed/vpssim-pagespeed-menu

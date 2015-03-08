@@ -1,0 +1,153 @@
+#!/bin/sh
+. /home/vpssim.conf
+re='^[0-9]+$'
+printf "=========================================================================\n"
+echo -n "Type in Data you want to auto backup [ENTER]:" 
+read dataname
+if [ -f /bin/vpssim-backupdb-$dataname ]; then
+clear
+echo "========================================================================="
+echo "Data $dataname configured Auto backup successful"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if [ -f /var/lib/mysql/$dataname/db.opt ]; then
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read abc456
+if [ "$abc456" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if [[ ! ${#abc456} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your backup more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi  
+echo -n "what time you want VPSSIM start backup ?[0-23]: " 
+read gio
+if [ "$gio" = "" ]; then
+gio="3"
+echo "You don't type in the time, the default is 3 AM"
+fi
+if ! [[ $gio =~ $re ]] ; then
+clear
+echo "========================================================================="
+echo "$gio is incorrect."
+echo "-------------------------------------------------------------------------"
+echo "The backup time must be a number within range of (0 - 23)."
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if ! [[ $gio -ge 0 && $gio -le 23  ]] ; then 
+clear
+echo "========================================================================="
+echo "$gio is incorrect."
+echo "-------------------------------------------------------------------------"
+echo "The backup time must be a number within range of (0 - 23)."
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi 
+echo "-------------------------------------------------------------------------"
+echo "0: Sunday, 1: Monday, 2: Tue, 3: Wed, 4: Thu, 5: Fri, 6: Saturday"
+echo -n "what day you want VPSSIM doing backup ?[0-6]: " 
+read thu
+if [ "$thu" = "" ]; then
+thu="0"
+echo "You don't type in the day, the default is sunday."
+fi
+if [ "$thu" = "0" ]; then
+thu12="Sunday"
+fi
+if [ "$thu" = "1" ]; then
+thu12="Monday"
+fi
+if [ "$thu" = "2" ]; then
+thu12="Tuesday"
+fi
+if [ "$thu" = "3" ]; then
+thu12="Wednesday"
+fi
+if [ "$thu" = "4" ]; then
+thu12="Thursday"
+fi
+if [ "$thu" = "5" ]; then
+thu12="Friday"
+fi
+if [ "$thu" = "6" ]; then
+thu12="Saturday"
+fi
+if ! [[ $thu =~ $re ]] ; then
+clear
+echo "========================================================================="
+echo "$thu is incorrect."
+echo "-------------------------------------------------------------------------"
+echo "The backup day must be a number within range of (0 -6)."
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if ! [[ $thu -ge 0 && $thu -le 6  ]] ; then 
+clear
+echo "========================================================================="
+echo "$thu is incorrect."
+echo "-------------------------------------------------------------------------"
+echo "The backup day must be a number within range of (0 -6)."
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi 
+read -r -p "You want backup database on $gio h $thu12 everyweek? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    cat > "/bin/vpssim-backupdb-$dataname" <<END
+#!/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+rm -rf /home/$mainsite/private_html/backup/$dataname
+mkdir -p /home/$mainsite/private_html/backup/$dataname
+cd /home/$mainsite/private_html/backup/$dataname
+mysqldump -u root -p$mariadbpass $dataname | gzip -9 > $abc456-$dataname.tar.gz
+END
+chmod +x /bin/vpssim-backupdb-$dataname
+if [ ! -f /etc/cron.d/vpssim.db.cron ]; then
+echo "SHELL=/bin/sh" > /etc/cron.d/vpssim.db.cron
+echo "0 $gio * * $thu root /bin/vpssim-backupdb-$dataname >/dev/null 2>&1" >> /etc/cron.d/vpssim.db.cron
+else
+  if [ "$(grep "SHELL=/bin/sh" /etc/cron.d/vpssim.db.cron)" == "" ]; then
+echo "SHELL=/bin/sh" > /etc/cron.d/vpssim.db.cron 
+  fi
+echo "0 $gio * * $thu root /bin/vpssim-backupdb-$dataname >/dev/null 2>&1" >> /etc/cron.d/vpssim.db.cron
+fi
+service crond restart
+clear
+echo "========================================================================="
+echo "Setting Auto backup for $dataname successful."
+echo "-------------------------------------------------------------------------"
+echo "Database will auto backup on: $gio h $thu12 everyweek."
+echo "-------------------------------------------------------------------------"
+echo "Link file backup (When successful backup):"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/$dataname/$abc456-$dataname.tar.gz"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+;;
+*)
+clear
+echo "========================================================================="
+echo "You cance config auto backup $dataname !"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+;;
+esac
+else
+clear
+echo "========================================================================="
+echo "Did not find out database: $dataname on server"
+echo "-------------------------------------------------------------------------"
+echo "please check again!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi

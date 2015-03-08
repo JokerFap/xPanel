@@ -1,0 +1,21 @@
+#!/bin/sh
+. /home/vpssim.conf
+php_version=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
+
+if [ "$php_version" == "5.6" ]; then
+/etc/vpssim/menu/nangcap-php/current56
+fi
+
+if [ "$php_version" == "5.5" ]; then
+/etc/vpssim/menu/nangcap-php/current55
+fi
+
+if [ "$php_version" == "5.4" ]; then
+/etc/vpssim/menu/nangcap-php/current54
+fi
+clear
+echo "========================================================================="
+echo "Sorry, VPSSIM can not check your PHP version"
+vpssim
+exit
+fi

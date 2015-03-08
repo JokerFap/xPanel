@@ -1,0 +1,87 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+
+
+saoluudata ()
+{
+echo "Please do not turn off this screen....!"
+rm -rf /home/$mainsite/private_html/backup/$dataname
+mkdir -p /home/$mainsite/private_html/backup/$dataname
+cd /home/$mainsite/private_html/backup/$dataname
+mysqldump -u root -p$mariadbpass $dataname | gzip -9 > $dataname_$abc456.tar.gz
+clear
+echo "========================================================================="
+echo "Link file backup:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/$dataname/$dataname_$abc456.tar.gz"
+echo "-------------------------------------------------------------------------"
+echo "if $mainsite use cloudflare, Use this link:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/$dataname/$dataname_$abc456.tar.gz"
+echo "-------------------------------------------------------------------------"
+echo "Note: Backup files can be restored normaly, but can't extract by softwear"
+echo "-------------------------------------------------------------------------"
+echo "To extract , you need to use the command gunzip: gunzip file.tar.gz"
+echo "-------------------------------------------------------------------------"
+echo "Or using command tar: tar -zxvf {file.tar.gz}"
+
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+}
+
+
+
+
+echo "========================================================================="
+echo -n "Type in Database you want to backup [ENTER]: " 
+read dataname
+
+if [ -f /var/lib/mysql/$dataname/db.opt ]; then
+echo "-------------------------------------------------------------------------"
+echo "Discover data $dataname on server"
+echo "-------------------------------------------------------------------------"
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read abc456
+if [ "$abc456" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+
+if [[ ! ${#abc456} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your backup more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi  
+
+if [ -f /home/$mainsite/private_html/backup/$dataname/*.tar.gz ]; then
+echo "Discover the old backup of this database"
+echo"--------------------------------------------------------------------------"
+read -r -p "Delete it and create new backup file ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+	echo "we are backing up data $dataname.........."
+	saoluudata
+        ;;
+    *)
+        echo ""
+        ;;
+esac
+else
+	echo "We are backing up data $dataname..........."
+	saoluudata
+fi
+
+else
+clear
+echo "========================================================================="
+echo "Did not find out database: $dataname on server, please check again!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi

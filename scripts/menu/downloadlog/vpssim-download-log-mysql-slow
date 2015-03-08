@@ -1,0 +1,27 @@
+#!/bin/bash
+. /home/vpssim.conf
+
+if [ -f /home/$mainsite/logs/mysql-slow.log ]; then
+rm -r -f /home/$mainsite/private_html/mysql-slow.log.zip
+\cp -uf /home/$mainsite/logs/mysql-slow.log /home/$mainsite/private_html/
+cd /home/$mainsite/private_html
+zip mysql-slow.log.zip mysql-slow.log
+rm -r -f mysql-slow.log
+cd
+echo "Please wait ..."
+sleep 2
+clear
+echo "========================================================================= "
+echo "Link download Mysql Slow Log:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/mysql-slow.log.zip"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/mysql-slow.log.zip"
+
+/etc/vpssim/menu/vpssim-eroor-menu
+exit
+fi
+clear
+echo "========================================================================= "
+echo "Log file does not exist or you disable write logfile Mysql Slow"
+/etc/vpssim/menu/vpssim-eroor-menu

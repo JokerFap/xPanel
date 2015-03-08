@@ -1,0 +1,37 @@
+#!/bin/bash
+prompt="Type in your choice (17-Exit):"
+options=( "Change password Root" "Setup Wordpress Multisite" "Auto re-start MySQL Server" "Fix blank white page" "Fix error Chmod, chown" "Find top Largest files & Folders" "Service Running & Ram Useage" "Check IP/Nameserver website" "Check Server info" "Setting VPS Timezone" "Setup FTP Server" "Install / Remove Imagick" "Install / Remove Ioncube" "Install Htop" "Update System & Service" "Restart Service" "Exit" )
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                          Tools - Addons\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+
+    1) /etc/vpssim/menu/vpssim-doi-pass-root-vps;;
+    2) clear && /etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu;;
+    3) /etc/vpssim/menu/tienich/befor-auto-start-mysql;;
+    4) /etc/vpssim/menu/tienich/vpssim-befor-bat-tat-display-eroor;;
+    5) /etc/vpssim/menu/vpssim-sua-loi-chown;;
+    6) /etc/vpssim/menu/tienich/vpssim-danh-sach-max-dung-luong-file;;
+    7) /etc/vpssim/menu/tienich/vpssim-dich-vu-dang-chay-va-ram-dung;;
+    8) /etc/vpssim/menu/tienich/vpssim-tim-ip-nameserver-website;;
+    9) /etc/vpssim/menu/tienich/vpssim-view-thong-tin-ip-vps;;
+    10) clear && /etc/vpssim/menu/vpssim-thay-doi-thong-tin-thoi-gian;;
+    11) clear &&/etc/vpssim/menu/vpssim-ftpserver-menu;; 
+    12) /etc/vpssim/menu/tienich/vpssim-before-imagick;;
+    13) /etc/vpssim/menu/tienich/vpssim-before-ioncube;;
+    14) /etc/vpssim/menu/tienich/vpssim-cai-dat-htop;;
+    15) clear && /etc/vpssim/menu/tienich/vpssim-update-service;;
+    16) clear && /etc/vpssim/menu/tienich/vpssim-restart-service;;
+    17) clear && vpssim;;
+
+            *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+done

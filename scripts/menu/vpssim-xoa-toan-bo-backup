@@ -1,0 +1,33 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+if [ ! -f /home/$mainsite/private_html/backup/* ]; then
+if [ ! -d /home/$mainsite/private_html/backup/* ]; then
+clear
+echo "========================================================================="
+echo "We do not find any backup files on this VPS"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi
+fi
+
+echo "========================================================================="
+read -r -p "You want to delete all backup files on Server? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+rm -r -f /home/$mainsite/private_html/backup/*
+echo "Please wait...."
+sleep 3
+clear
+echo "========================================================================= "
+echo "Deleted all backup files successfully  "
+/etc/vpssim/menu/vpssim-sao-luu
+;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+echo "========================================================================="
+echo "Cancel delete all backup files."
+/etc/vpssim/menu/vpssim-sao-luu

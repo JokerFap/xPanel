@@ -1,0 +1,61 @@
+#!/bin/bash
+if [ ! -f /etc/vpssim/nginx.version ]; then
+clear
+echo "========================================================================="
+echo "VPSSIM can not upgrade Nginx on this VPS"
+echo "-------------------------------------------------------------------------"
+echo "Please do not delete nginx.version in /etc/vpssim/"
+vpssim
+exit
+fi
+
+wget -q http://vpssim.com/script/vpssim/nginx-nangcap/nginx.newversion -O /etc/vpssim/nginx.newversion && chmod 777 /etc/vpssim/nginx.newversion
+LOCALVER=`cat /etc/vpssim/nginx.version`
+REMOVER=`cat /etc/vpssim/nginx.newversion`
+
+if [ "$LOCALVER" == "$REMOVER" ]; then
+rm -r -f /etc/vpssim/nginx.newversion
+clear
+echo "========================================================================="
+echo "The current Nginx version on your server is:  $LOCALVER"
+echo "-------------------------------------------------------------------------"
+echo "This is newest Nginx version, VPSSIM can support!"
+/etc/vpssim/menu/tienich/vpssim-update-service
+else
+echo "========================================================================="
+echo "Nginx update discovered"
+echo "-------------------------------------------------------------------------"
+echo "The current version on your VPS is:  $LOCALVER"
+echo "-------------------------------------------------------------------------"
+echo "The version on the air:  $REMOVER"
+echo "========================================================================="
+read -r -p "You want to upgrade Nginx to lastest version ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "-------------------------------------------------------------------------"
+echo "Prepare to update Nginx..... "
+sleep 2
+rm -r -f /etc/vpssim/nginx.newversion
+rm -f /etc/vpssim/vpssim-nang-cap-nginx-server
+wget -q http://vpssim.com/script/vpssim/nginx-nangcap/vpssim-nang-cap-nginx-server -O /etc/vpssim/vpssim-nang-cap-nginx-server && chmod +x /etc/vpssim/vpssim-nang-cap-nginx-server
+/etc/vpssim/vpssim-nang-cap-nginx-server
+
+exit
+
+ ;;
+    *)
+        echo ""
+        ;;
+esac
+clear && /etc/vpssim/menu/tienich/vpssim-update-service
+exit
+fi
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,54 @@
+#!/bin/bash
+. /home/vpssim.conf
+if [ -f /etc/vsftpd/vsftpd.conf ]; then
+clear
+echo "========================================================================= "
+echo "FTP server is installed on your VPS. "
+/etc/vpssim/menu/vpssim-ftpserver-menu
+exit
+fi
+if [ -f /etc/proftpd.conf ]; then
+clear
+echo "========================================================================= "
+echo "FTP server is installed on your VPS. "
+/etc/vpssim/menu/vpssim-ftpserver-menu
+exit
+fi
+echo "========================================================================= "
+echo "Prepare to install VSFTPD on Server... "
+sleep 3
+yum -y install vsftpd
+
+sed -i 's/root/#root/g' /etc/vsftpd/ftpusers
+sed -i 's/root/#root/g' /etc/vsftpd/user_list
+sed -i 's/anonymous_enable=YES/anonymous_enable=NO/g' /etc/vsftpd/vsftpd.conf
+sed -i 's/local_enable=NO/local_enable=YES/g' /etc/vsftpd/vsftpd.conf
+sed -i 's/#ascii_upload_enable=YES/ascii_upload_enable=YES/g' /etc/vsftpd/vsftpd.conf
+sed -i 's/#ascii_download_enable=YES/ascii_download_enable=YES/g' /etc/vsftpd/vsftpd.conf
+sed -i 's/#ls_recurse_enable=YES/ls_recurse_enable=YES/g' /etc/vsftpd/vsftpd.conf
+echo 'local_root=home' >> /etc/vsftpd/vsftpd.conf
+echo 'use_localtime=YES' >> /etc/vsftpd/vsftpd.conf
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+/etc/init.d/vsftpd start
+chkconfig vsftpd on
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl start vsftpd 
+systemctl enable vsftpd 
+fi
+clear
+echo "========================================================================= "
+echo "Prepare to open port 21 in IPtables firewall"
+sleep 2
+iptables -I INPUT -p tcp --dport 21 -j ACCEPT
+service iptables save
+chown -R nginx:nginx /home
+clear
+echo "========================================================================= "
+echo "Successfully installed FTP server"
+echo "-------------------------------------------------------------------------"
+echo "Login info: IP: $serverip, Port: 21, Login with user root's info  "
+/etc/vpssim/menu/vpssim-ftpserver-menu
+exit
+fi

@@ -1,0 +1,180 @@
+#!/bin/bash 
+. /home/vpssim.conf
+if [ -f /etc/php.d/opcache.ini ]; then
+clear
+echo "========================================================================="
+echo "               VPSSIM - Manage VPS/Server by VPSSIM.COM      "       
+echo "========================================================================="
+echo "                         Config Zend OPcache"
+echo "========================================================================="
+echo ""
+echo ""
+
+
+
+echo "Go to http://$serverip:$priport/ocp.php to see RAM Opcache need"
+echo "========================================================================="
+echo "RAM for Opcache must be a number within range of (20 - $(calc $( free -m | awk 'NR==2 {print $2}' )/6))."
+echo "-------------------------------------------------------------------------"
+echo -n "Type in the RAM size you config for Zend Opcache use [ENTER]: " 
+read opcacheram
+
+if [ "$opcacheram" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please fill accurately"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi
+
+if ! [[ $opcacheram -ge 20 && $opcacheram -le $(calc $( free -m | awk 'NR==2 {print $2}' )/6)  ]] ; then  
+clear
+echo "========================================================================="
+echo "$opcacheram is wrong!"
+echo "-------------------------------------------------------------------------"
+echo "RAM for Opcache must be a number within range of (20 - $(calc $( free -m | awk 'NR==2 {print $2}' )/6))."
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi  
+
+echo "========================================================================="
+echo "Current PHP files in Home folder: $(find /home -type f | grep php | wc -l) files"
+echo "PHP MAX is the max of PHP files can be cached by Zend Opcache "
+echo "PHP MAX must be a number within range of (2000 - 50000)."
+echo "-------------------------------------------------------------------------"
+echo -n "Type PHP MAX [ENTER]: " 
+read filephp
+if [ "$filephp" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please fill accurately"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi
+
+if ! [[ $filephp -ge 2000 && $filephp -le 50000  ]] ; then 
+clear
+echo "========================================================================="
+echo "$filephp is wrong!"
+echo "-------------------------------------------------------------------------"
+echo "PHP MAX must be a number within range of (2000 - 50000)."
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi  
+php_version=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
+
+if [ "$php_version" == "5.6" ]; then 
+rm -f /etc/php.d/*.opcache.*
+cat > "/etc/php.d/opcache.ini" <<END
+zend_extension=opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=$opcacheram
+opcache.interned_strings_buffer=16
+opcache.max_accelerated_files=$filephp
+opcache.max_wasted_percentage=5
+opcache.use_cwd=1
+opcache.validate_timestamps=1
+opcache.revalidate_freq=999999999
+opcache.fast_shutdown=1
+END
+fi
+if [ "$php_version" == "5.5" ]; then
+rm -f /etc/php.d/*.opcache.*
+rm -f /etc/php.d/opcache.*
+cat > "/etc/php.d/opcache.ini" <<END
+zend_extension=opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=$opcacheram
+opcache.interned_strings_buffer=16
+opcache.max_accelerated_files=$filephp
+opcache.max_wasted_percentage=5
+opcache.use_cwd=1
+opcache.validate_timestamps=1
+opcache.revalidate_freq=999999999
+opcache.fast_shutdown=1
+END
+fi
+if [ "$php_version" == "5.4" ]; then  
+rm -f /etc/php.d/*.opcache.*
+rm -f /etc/php.d/opcache.*
+cat > "/etc/php.d/opcache.ini" <<END
+zend_extension=/usr/lib64/php/modules/opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=$opcacheram
+opcache.interned_strings_buffer=16
+opcache.max_accelerated_files=$filephp
+opcache.max_wasted_percentage=5
+opcache.use_cwd=1
+opcache.validate_timestamps=1
+opcache.revalidate_freq=999999999
+opcache.fast_shutdown=1
+END
+fi
+rm -r -f /etc/vpssim/opcache.conf
+cat > "/etc/vpssim/opcache.conf" <<END
+opcachesize="$opcacheram"
+opcachephpmax="$filephp"
+END
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+else
+systemctl restart php-fpm.service
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+test_php=$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')
+if [ "$test_php" == "stopped" ]; then
+clear
+echo "========================================================================="
+echo "You config Wrong ! Please re-config again."
+echo "-------------------------------------------------------------------------"
+echo "Website is 502 error now !"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+test_php=$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')
+if [ "$test_php" == "inacctive" ]; then
+clear
+echo "========================================================================="
+echo "You config Wrong ! Please re-config again."
+echo "-------------------------------------------------------------------------"
+echo "Website is 502 error now !"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+test_php=$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')
+if [ "$test_php" == "failed" ]; then
+clear
+echo "========================================================================="
+echo "You config Wrong ! Please re-config again."
+echo "-------------------------------------------------------------------------"
+echo "Website is 502 error now !"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi
+fi
+clear
+echo "========================================================================="
+echo "Configed Zend Opcache using $opcacheram MB RAM"
+echo "-------------------------------------------------------------------------"
+echo "Max PHP file Zend Opcache can cache = $filephp"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+fi
+clear
+echo "========================================================================= "
+echo "Zend OPcache is disable in VPS"
+echo "-------------------------------------------------------------------------"
+echo "Lets enable Opcache to get the best VPS productivity"
+/etc/vpssim/menu/opcache/vpssim-before-opcache
+exit
+fi

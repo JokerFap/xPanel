@@ -1,0 +1,5 @@
+#!/bin/sh
+clear
+echo "========================================================================="
+echo "Amount of connections are SYN_RECV: $(netstat -n | grep :80 | grep SYN_RECV|wc -l)"
+/etc/vpssim/menu/vpssim-kiem-tra-ddos

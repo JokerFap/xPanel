@@ -1,0 +1,84 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+
+if [ -f /home/$mainsite/private_html/index.php ]; then 
+echo "========================================================================="
+echo "Access to phpmyadmin through: $mainsite:$priport  or $serverip:$priport"
+echo "Disable Phpmyadmin Login, in case of not using"
+echo "For not affecting database and improving security"
+echo "========================================================================="
+echo "Phpmyadmin link is ON, whoever know the $priport can access it"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to turn it OFF? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+	mv /home/$mainsite/private_html/index.php /home/$mainsite/private_html/index.bak
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart php-fpm.service
+fi
+	rm -f /home/$mainsite/private_html/index.html
+    cat > "/home/$mainsite/private_html/index.html" <<END
+<!DOCTYPE html>
+<html id="HZSERver" lang="en-US" dir="LTR" class="Public Cute Pig" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+<meta charset="utf-8"/>
+<title>Cute Pig !!!</title>
+</head>
+<body>
+<center><img src="https://hostingaz.vn/script/vpssim/pig.jpg"></center><br><br>
+<center>What do you want?</center>
+</body>
+</html>
+END
+clear
+echo "========================================================================="
+	echo "Phpmyadmin link is disable successful !"
+/etc/vpssim/menu/vpssim-phpmyadmin-menu
+        ;;
+    *)
+        echo ""
+        ;;
+esac
+exit
+fi
+echo "========================================================================="
+echo "Access Phpmyadmin through: $mainsite:$priport  or $serverip:$priport"
+echo "========================================================================="
+echo "Current: Phpmyadmin link is OFF !!!"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to turn it ON? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+	mv /home/$mainsite/private_html/index.bak /home/$mainsite/private_html/index.php
+	rm -f /home/$mainsite/private_html/index.html
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart php-fpm.service
+fi
+clear
+        echo "========================================================================="
+        echo "Phpmyadmin link is enabled successful !"
+echo "-------------------------------------------------------------------------"
+               echo "Access phpmyadmin through: $mainsite:$priport  or $serverip:$priport"
+/etc/vpssim/menu/vpssim-phpmyadmin-menu
+        ;;
+    *)
+               clear
+ echo "========================================================================="
+echo " Cancle!"
+/etc/vpssim/menu/vpssim-phpmyadmin-menu
+
+        ;;
+esac
+clear
+        echo "========================================================================="
+echo "Cancle !"
+/etc/vpssim/menu/vpssim-phpmyadmin-menu
+exit
+fi

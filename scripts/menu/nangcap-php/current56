@@ -1,0 +1,45 @@
+#!/bin/sh
+. /home/vpssim.conf
+prompt="Type in your choice:"
+options=("Downgrade Php to 5.5" "Downgrade Php to 5.4" "Exit")
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM                \n"
+printf "=========================================================================\n"
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')" == "stopped" ]; then
+echo "                        PHP-FPM Can not Start !"
+fi
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $5}')" == "running..." ]; then
+printf "                     Your PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "inactive" ]; then
+echo "                         PHP-FPM Stopped !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "failed" ]; then
+echo "                       PHP-FPM Can not Start !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "active" ]; then
+printf "                     Your PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+printf "=========================================================================\n"
+printf "                      Upgrade or Downgrade PHP                          \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+    1) /etc/vpssim/menu/nangcap-php/php56thanh55;;
+    2) /etc/vpssim/menu/nangcap-php/php56thanh54;;
+    3) clear && vpssim;;  
+    *) echo "You typed wrong, please type in the ordinal number on the list";continue;;
+
+    esac
+
+done

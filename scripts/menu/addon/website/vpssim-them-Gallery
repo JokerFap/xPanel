@@ -1,0 +1,30 @@
+#!/bin/bash
+prompt="Type in your choice (7-Exit):"
+options=( "Add Website + 4images" "Add Website + Coppermine" "Add Website + Gallery " "Add Website + Piwigo " "Add Website + Tinywebgallery" "Add Website + Zenphoto" "Exit")
+printf "=========================================================================\n"
+printf "              VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                     Add Website + Code Gallery \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+
+1) rm -r -f website-4images && wget -q http://vpssim.com/script/vpssim/addon/website/gallery/website-4images && chmod +x website-4images && clear &&./website-4images;;
+2) rm -r -f website-Coppermine && wget -q http://vpssim.com/script/vpssim/addon/website/gallery/website-Coppermine && chmod +x website-Coppermine && clear &&./website-Coppermine;;
+3) rm -r -f website-gallery-2.3.2-full && wget -q http://vpssim.com/script/vpssim/addon/website/gallery/website-gallery-2.3.2-full && chmod +x website-gallery-2.3.2-full && clear &&./website-gallery-2.3.2-full;;
+4) rm -r -f website-piwigo && wget -q http://vpssim.com/script/vpssim/addon/website/gallery/website-piwigo && chmod +x website-piwigo && clear &&./website-piwigo;;
+5) rm -r -f website-Tinywebgallery && wget -q http://vpssim.com/script/vpssim/addon/website/gallery/website-Tinywebgallery && chmod +x website-Tinywebgallery && clear &&./website-Tinywebgallery;;
+6) rm -r -f website-Zenphoto && wget -q http://vpssim.com/script/vpssim/addon/website/gallery/website-Zenphoto && chmod +x website-Zenphoto && clear &&./website-Zenphoto;;
+7) clear && /etc/vpssim/menu/vpssim-them-website-menu;;
+        *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+
+
+

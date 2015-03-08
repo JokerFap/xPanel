@@ -1,0 +1,87 @@
+#!/bin/sh
+. /home/vpssim.conf
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service mysql status | awk 'NR==1 {print $4}')" == "not" ]; then
+/etc/init.d/mysql restart
+if [ "$(/sbin/service mysql status | awk 'NR==1 {print $4}')" == "not" ]; then
+clear
+echo "========================================================================="
+echo "MySQL can not start! "
+echo "-------------------------------------------------------------------------"
+echo "Maybe you did a wrong config  !"
+/etc/vpssim/menu/tienich/vpssim-restart-service
+else
+clear
+echo "========================================================================="
+echo "MySQL restart successful "
+/etc/vpssim/menu/tienich/vpssim-restart-service
+exit
+fi
+fi
+fi
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then
+if [ ! "$(/sbin/service mysql status | awk 'NR==1 {print $4}')" == "not" ]; then
+/etc/init.d/mysql restart
+if [ "$(/sbin/service mysql status | awk 'NR==1 {print $4}')" == "not" ]; then
+clear
+echo "========================================================================="
+echo "MySQL can not start! "
+echo "-------------------------------------------------------------------------"
+echo "Maybe you did a wrong config  !"
+/etc/vpssim/menu/tienich/vpssim-restart-service
+else
+clear
+echo "========================================================================="
+echo "MySQL restart successful "
+/etc/vpssim/menu/tienich/vpssim-restart-service
+exit
+fi
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ ! "$(/bin/systemctl status  mariadb.service| awk 'NR==3 {print $2}')" == "active" ]; then
+systemctl start mariadb.service
+if [ ! "$(/bin/systemctl status  mariadb.service| awk 'NR==3 {print $2}')" == "active" ]; then
+clear
+echo "========================================================================="
+echo "MariaDB can not start! "
+echo "-------------------------------------------------------------------------"
+echo "Maybe you did a wrong config  !"
+/etc/vpssim/menu/tienich/vpssim-restart-service
+else
+clear
+echo "========================================================================="
+echo "MariaDB restart successful "
+/etc/vpssim/menu/tienich/vpssim-restart-service
+exit
+fi
+fi
+fi
+
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  mariadb.service| awk 'NR==3 {print $2}')" == "active" ]; then
+systemctl restart mariadb.service
+if [ "$(/bin/systemctl status  mariadb.service| awk 'NR==3 {print $2}')" == "active" ]; then
+clear
+echo "========================================================================="
+echo "MariaDB restart successful "
+/etc/vpssim/menu/tienich/vpssim-restart-service
+else
+clear
+echo "========================================================================="
+echo "MariaDB can not start! "
+echo "-------------------------------------------------------------------------"
+echo "Maybe you did a wrong config  !"
+/etc/vpssim/menu/tienich/vpssim-restart-service
+exit
+fi
+fi
+fi
+
+

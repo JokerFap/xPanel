@@ -1,0 +1,148 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+echo "-------------------------------------------------------------------------"
+echo -n "Type in database you want to create [ENTER]: " 
+read dataname
+if [ "$dataname" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please type in accurately"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+if [[ $dataname =~ ^[0-9]+$ ]]; then
+clear
+echo "========================================================================="
+echo "You may not use only number for naming database."
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+
+kiemtradata="^[a-zA-Z0-9_][-a-zA-Z0-9_]{0,61}[a-zA-Z0-9_]$";
+if [[ ! "$dataname" =~ $kiemtradata ]]; then
+	website=`echo $dataname | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "Create $dataname failed! "
+echo "-------------------------------------------------------------------------"
+echo "You must use only numbers, letters and character: _  "
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi 
+
+if [[ ! ${#dataname} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "Create $dataname is failed!"
+echo "-------------------------------------------------------------------------"
+echo "The name of Database must be at least 5 characters long "
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi  
+if [ -f /var/lib/mysql/$dataname/db.opt ]; then
+clear
+echo "========================================================================="
+echo "Data $dataname is existed on server"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+    cat > "/tmp/config.temp" <<END
+CREATE DATABASE $dataname COLLATE utf8_general_ci;
+END
+
+mysql -u root -p$mariadbpass < /tmp/config.temp
+rm -f /tmp/config.temp
+echo "Create data $dataname successfully !"
+echo "Default Charset is utf8 !"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to create new user for $dataname ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+	echo -n "Type username [ENTER]: " 
+	read username
+	if [ "$username" = "" ]; then
+		username="$dataname"
+		echo "You typed wrong, we will name username is $dataname"
+	fi
+	echo -n "Type password [ENTER]: " 
+	read password
+		if [[ ! ${#password} -ge 6 ]]; then
+	
+	 cat > "/tmp/config.temp" <<END
+drop database $dataname;
+END
+mysql -u root -p$mariadbpass < /tmp/config.temp
+rm -f /tmp/config.temp
+clear
+echo "========================================================================="
+echo "Create $dataname is failed!"
+echo "-------------------------------------------------------------------------"
+echo "The password must be at least 6 characters long "
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi  
+
+ cat > "/tmp/config.temp" <<END
+CREATE USER '$username'@'localhost' IDENTIFIED BY '$password';
+END
+
+	mysql -u root -p$mariadbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+    cat > "/tmp/config.temp" <<END
+GRANT ALL PRIVILEGES ON $dataname . * TO '$username'@'localhost';
+END
+	mysql -u root -p$mariadbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+    cat > "/tmp/config.temp" <<END
+FLUSH PRIVILEGES;
+END
+	mysql -u root -p$mariadbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+	
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Database: $dataname - Created on: $(date +%d/%m/%Y)" >> /home/DBinfo.txt
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Data name: $dataname" >> /home/DBinfo.txt
+echo "Username: $username" >> /home/DBinfo.txt
+echo "password: $password" >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+
+clear
+echo "========================================================================="
+echo "Created $dataname and user $username successfully !"
+echo "-------------------------------------------------------------------------"
+echo "Database's infomation saved in: /home/DBinfo.txt"
+/etc/vpssim/menu/vpssim-them-xoa-database
+            ;;
+    *)
+
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Database: $dataname - Created on: $(date +%d/%m/%Y)" >> /home/DBinfo.txt
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Databasae: $dataname" >> /home/DBinfo.txt
+echo "Username: root" >> /home/DBinfo.txt
+echo "password: $mariadbpass" >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+
+	echo ""
+        ;;
+esac
+clear
+echo "========================================================================="
+echo "Created data $dataname successfully "
+echo "-------------------------------------------------------------------------"
+echo "Database's infomation saved in: /home/DBinfo.txt"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi

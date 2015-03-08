@@ -1,0 +1,36 @@
+#!/bin/bash 
+if [ -f /etc/vsftpd/vsftpd.conf ]; then
+echo "========================================================================= "
+read -r -p "You want to remove FTP server ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "Prepare to Remove VSFTPD ... "
+sleep 2
+yum remove vsftpd -y
+clear
+echo "========================================================================= "
+echo "Prepare to CLOSE port 21 in IPtables firewall"
+sleep 3
+iptables -I INPUT -p tcp --dport 21 -j DROP
+service iptables save
+;;
+    *)
+       clear 
+echo "========================================================================= "
+echo "Cancle removing FTP Server "
+/etc/vpssim/menu/vpssim-ftpserver-menu
+        ;;
+esac
+clear 
+echo "========================================================================= "
+echo "VPSSIM finished removing FTP Server "
+/etc/vpssim/menu/vpssim-ftpserver-menu
+fi
+clear
+echo "========================================================================= "
+echo "Have not install FTP server on this VPS "
+/etc/vpssim/menu/vpssim-ftpserver-menu
+exit
+fi
+
+

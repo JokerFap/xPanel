@@ -1,0 +1,23 @@
+#!/bin/bash
+prompt="Type in your choice:"
+options=("Install FTP Server" "Remove FTP Server")
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                      Install or Remove FTP Server \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" "Exit"; do 
+
+    case "$REPLY" in
+
+    1 ) /etc/vpssim/menu/vpssim-cai-dat-ftp-server;;
+    2 ) /etc/vpssim/menu/vpssim-remove-ftp-server;;
+  
+$(( ${#options[@]}+1 )) ) echo "";  clear && /etc/vpssim/menu/vpssim-tien-ich;;
+     *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done

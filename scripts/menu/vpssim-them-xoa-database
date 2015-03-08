@@ -1,0 +1,26 @@
+#!/bin/sh
+. /home/vpssim.conf
+prompt="Type in your choice:"
+options=("Create database" "Delete database" "Backup & Restore database" "List Database on VPS" "Exit")
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM              \n"
+printf "=========================================================================\n"
+printf "                           Database Manage                 \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in   
+    1) /etc/vpssim/menu/vpssim-tao-database;;
+    2) /etc/vpssim/menu/vpssim-xoa-database;; 
+    3) clear && /etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database;;
+    4) /etc/vpssim/menu/vpssim-list-database-tren-vps;; 
+    5) clear && /bin/vpssim;;   
+    *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+
+ 

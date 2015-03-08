@@ -1,0 +1,36 @@
+#!/bin/bash
+prompt="Type in your choice (6-Exit):"
+options=( "Open Port (INPUT)" "Close Port (INPUT)" "Check services using port" "Open Phpmyadmin Port" "Close Phpmyadmin Port" "Exit" )
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                      IPtables Firewall Manage\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+
+    1) /etc/vpssim/menu/tienich/vpssim-mo-port-ip-tables;;
+    2) /etc/vpssim/menu/tienich/vpssim-dong-port-ip-tables;;
+    3) /etc/vpssim/menu/tienich/vpssim-check-port-service;;
+    4) /etc/vpssim/menu/tienich/vpssim-mo-phpmyadmin-port;;
+    5) /etc/vpssim/menu/tienich/vpssim-dong-phpmyadmin-port;;
+    6) clear && /bin/vpssim;;
+
+            *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+done
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+. /home/vpssim.conf
+
+if [ -f /home/$mainsite/logs/php-fpm.log ]; then
+rm -r -f /home/$mainsite/private_html/php-fpm.log.zip
+\cp -uf /home/$mainsite/logs/php-fpm.log /home/$mainsite/private_html
+cd /home/$mainsite/private_html
+zip php-fpm.log.zip php-fpm.log
+rm -r -f php-fpm.log
+cd
+echo "Please wait ..."
+sleep 2
+clear
+echo "========================================================================= "
+echo "Link download PHP-FPM Log:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/php-fpm.log.zip"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/php-fpm.log.zip"
+
+
+/etc/vpssim/menu/vpssim-eroor-menu
+exit
+fi
+clear
+echo "========================================================================= "
+echo "Log file does not exist or you disable write LOG PHP-FPM."
+/etc/vpssim/menu/vpssim-eroor-menu

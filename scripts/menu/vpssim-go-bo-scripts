@@ -1,0 +1,75 @@
+#!/bin/bash
+
+printf "==========================================================\n"
+printf "Ban phai can nhac ky truoc khi go bo VPSSIM !!\n"
+printf "Tat ca du lieu va config tren VPS se bi xoa sach !!!!!!!\n"
+printf "Du lieu se khong the phuc hoi, VPS tro lai trang thai nhu moi\n"
+printf "==========================================================\n"
+
+read -r -p "Ban chac chan muon go bo hoan toan VPSSIM? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "Chuan bi go bo VPSSIM Script , vui long doi...."
+sleep 4
+service exim stop
+chkconfig exim off
+service nginx stop
+chkconfig nginx off
+service mysql stop
+chkconfig mysql off
+service syslog-ng stop
+chkconfig syslog-ng off
+service php-fpm stop
+chkconfig php-fpm off
+
+yum -y remove MariaDB*
+yum -y remove nginx
+yum -y remove php*
+yum -y remove exim
+yum -y remove httpd*
+yum -y remove syslog-ng
+
+
+rm -rf /home/*
+rm -rf /etc/nginx
+rm -rf /etc/php-fpm.d
+rm -rf /etc/php.d
+rm -rf /etc/php.zts.d
+rm -rf /etc/exim
+rm -rf /var/lib/mysql
+rm -rf /etc/my.cnf.d
+rm -rf /etc/cron.d/*
+rm -rf /etc/httpd
+rm -rf /etc/syslog-ng
+rm -f /etc/yum.repo.d/epel.repo
+rm -f /etc/yum.repo.d/remi.repo
+rm -f /etc/yum.repo.d/nginx.repo
+rm -f /etc/yum.repo.d/MariaDB.repo
+rm -f /etc/yum.repo.d/epel-testing.repo
+rm -f /etc/php-fpm.conf
+rm -f /etc/php.ini
+rm -f /etc/my.cnf
+rm -f /etc/rc.d/init.d/exim
+rm -f /etc/rc.d/init.d/httpd
+rm -f /etc/rc.d/init.d/mysql
+rm -f /etc/rc.d/init.d/nginx
+rm -f /etc/rc.d/init.d/php-fpm
+rm -f /etc/rc.d/init.d/syslog-ng
+rm -rf /root/*
+rm -r -f /bin/vpssim
+rm -r -f /bin/vpssim-check-downtime
+rm -r -f /bin/calc
+rm -r -f /etc/vpssim
+
+
+
+
+echo "Done all...!"
+echo "Server se khoi dong lai sau 3s de hoan tat...!"
+sleep 3
+reboot
+        ;;
+    *)
+        echo "Lenh go bo VPSSIM da duoc huy..."
+        ;;
+esac

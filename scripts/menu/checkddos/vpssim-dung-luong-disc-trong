@@ -1,0 +1,5 @@
+#!/bin/sh
+clear
+echo "========================================================================="
+df -h
+/etc/vpssim/menu/vpssim-check-thong-tin-server

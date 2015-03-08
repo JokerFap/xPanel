@@ -1,0 +1,20 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "Please wait...."
+sleep 2
+rm -r -f /home/$mainsite/private_html/nginx.log.zip
+\cp -uf /var/log/nginx/error.log /home/$mainsite/private_html/
+cd /home/$mainsite/private_html
+zip nginx.log.zip /home/$mainsite/private_html/error.log
+rm -r -f error.log
+clear
+echo "========================================================================= "
+echo "Link download Log Nginx:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/nginx.log.zip"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/nginx.log.zip"
+
+
+/etc/vpssim/menu/vpssim-eroor-menu
+

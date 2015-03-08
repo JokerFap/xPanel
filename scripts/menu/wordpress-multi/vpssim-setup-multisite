@@ -1,0 +1,105 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "========================================================================="   
+echo -n "Type in the domain : " 
+read domainMutilsite
+if [ "$domainMutilsite" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately "
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$domainMutilsite" =~ $kiemtradomain3 ]]; then
+	domainMutilsite=`echo $domainMutilsite | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$domainMutilsite maybe not a domain name !"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+if [ ! -f /etc/nginx/conf.d/$domainMutilsite.conf ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite is not exist in the system !"
+echo "-------------------------------------------------------------------------"
+echo "Please try again"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+if [ -f /home/$domainMutilsite/public_html/wp-config-sample.php ]; then
+if [ ! -f /home/$domainMutilsite/public_html/wp-config.php ]; then
+/home/phammai.com/public_html/
+clear
+echo "========================================================================="
+echo "$domainMutilsite has wordpress code but not installed!"
+echo "-------------------------------------------------------------------------"
+echo "Install the wordpress first and try again !"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+fi
+
+
+if [ ! -f /home/$domainMutilsite/public_html/wp-config.php ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite is not wordpress blog !"
+echo "-------------------------------------------------------------------------"
+echo "Please try again."
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+if [ "$(grep "define('WP_ALLOW_MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "define('WP_ALLOW_MULTISITE', true);" ]; then
+if [ "$(grep "define('MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "" ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite da hoan thanh buoc I ( Setup Multisite - Step I)"
+echo "-------------------------------------------------------------------------"
+echo "Hay truy cap $domainMutilsite, login va active Multisite"
+echo "-------------------------------------------------------------------------"
+echo "Sau do thuc hien tiep buoc II (option II)"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+fi
+
+if [ "$(grep "define('WP_ALLOW_MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "define('WP_ALLOW_MULTISITE', true);" ]; then
+if [ "$(grep "define('MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "define('MULTISITE', true);" ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite configured for Multisite successfully ."
+echo "-------------------------------------------------------------------------"
+echo "You can create multisite in wp-admin and enabled the sub by option #3"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+fi
+echo "Please wait..."
+sleep 3
+
+sed -i "/define('WP_DEBUG', false);/adefine('WP_ALLOW_MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart php-fpm.service
+fi
+clear
+echo "========================================================================="
+echo "configured Multisite for $domainMutilsite in Step I successfully "
+echo "-------------------------------------------------------------------------"
+echo "You MUST go to $domainMutilsite, login and active Multisite"
+echo "-------------------------------------------------------------------------"
+echo "Then do the step II (option #2)"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi

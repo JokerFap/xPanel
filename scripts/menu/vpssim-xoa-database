@@ -1,0 +1,55 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+printf "=========================================================================\n"
+printf "After deleting database, you can not recover it, so be careful\n"
+echo "-------------------------------------------------------------------------"
+echo -n "Type in database you want to delete [ENTER]: " 
+read dataname
+
+if [ "$dataname" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please type in accurately!"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+
+if [ "$dataname" = "mysql" ] || [ "$dataname" = "infomation_schema" ] || [ "$dataname" = "performance_schema" ]; then
+clear
+echo "========================================================================="
+echo "You are crazy !!! You want to delete system's data ?"
+echo "-------------------------------------------------------------------------"
+echo "Bye...!"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+
+if [ -f /var/lib/mysql/$dataname/db.opt ]; then
+read -r -p "We find out $dataname, are you sured want to delete it ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    cat > "/tmp/config.temp" <<END
+drop database $dataname;
+END
+
+mysql -u root -p$mariadbpass < /tmp/config.temp
+rm -f /tmp/config.temp
+    
+clear
+echo "========================================================================="
+echo "Deleted data $dataname successfully !"
+/etc/vpssim/menu/vpssim-them-xoa-database
+        ;;
+    *)
+        echo "========================================================================= "
+        ;;
+esac
+else
+clear
+echo "========================================================================="
+echo "Data $dataname is not existed or It is empty"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+

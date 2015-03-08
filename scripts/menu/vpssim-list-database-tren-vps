@@ -1,0 +1,63 @@
+#!/bin/bash
+. /home/vpssim.conf
+if [ ! -d "/home/$mainsite/private_html/listdata" ]; then
+mkdir -p /home/$mainsite/private_html/listdata
+else
+rm -rf /home/$mainsite/private_html/listdata/*.*
+fi
+echo "========================================================================="
+echo "This function create list database on your VPS"
+echo "-------------------------------------------------------------------------"
+read -r -p "You want to view this list ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "-------------------------------------------------------------------------"
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read listdata
+if [ "$listdata" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately. "
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+if [[ ! ${#listdata} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your list files more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi  
+echo "-------------------------------------------------------------------------"
+echo "Please wait.... !"
+sleep 2
+cd /var/lib/mysql
+echo "=========================================================================" > /home/$mainsite/private_html/listdata/$listdata-listdata.txt
+echo "                             LIST DATABASE "                         >>/home/$mainsite/private_html/listdata/$listdata-listdata.txt
+echo "=========================================================================" >> /home/$mainsite/private_html/listdata/$listdata-listdata.txt
+tree -d -i -L 1 >> /home/$mainsite/private_html/listdata/$listdata-listdata.txt
+sed -i 's/directories/database on VPS (mysql & performance_schema are default databases)/g' /home/$mainsite/private_html/listdata/$listdata-listdata.txt
+echo "=========================================================================" >> /home/$mainsite/private_html/listdata/$listdata-listdata.txt
+cd
+clear
+echo "========================================================================="
+echo "Link view the list database on VPS :"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/listdata/$listdata-listdata.txt"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/listdata/$listdata-listdata.txt"
+/etc/vpssim/menu/vpssim-them-xoa-database
+        ;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+clear
+echo "========================================================================="
+echo "Cancel CREATE list database."
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi

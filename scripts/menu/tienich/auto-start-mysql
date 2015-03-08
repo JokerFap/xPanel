@@ -1,0 +1,11 @@
+#!/bin/sh
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service mysql start
+/etc/init.d/mysql restart
+exit
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl start mariadb.service
+exit
+fi
+

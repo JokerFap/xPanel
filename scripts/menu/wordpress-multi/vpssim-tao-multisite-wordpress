@@ -1,0 +1,197 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "========================================================================="   
+echo -n "Type in the domain: " 
+read domainMutilsite
+if [ "$domainMutilsite" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately "
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$domainMutilsite" =~ $kiemtradomain3 ]]; then
+	domainMutilsite=`echo $domainMutilsite | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$domainMutilsite maybe not a domain name !"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+if [ ! -f /etc/nginx/conf.d/$domainMutilsite.conf ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite is not exist in the system!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+if [ -f /home/$domainMutilsite/public_html/wp-config-sample.php ]; then
+if [ ! -f /home/$domainMutilsite/public_html/wp-config.php ]; then
+/home/phammai.com/public_html/
+clear
+echo "========================================================================="
+echo "$domainMutilsite has wordpress code but not installed!"
+echo "-------------------------------------------------------------------------"
+echo "Please install wordpress and try again !"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+fi
+
+if [ ! -f /home/$domainMutilsite/public_html/wp-config.php ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite is not wordpress blog !"
+echo "-------------------------------------------------------------------------"
+echo "Please try again."
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+if [ "$(grep "define('WP_ALLOW_MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "define('WP_ALLOW_MULTISITE', true);" ]; then
+if [ "$(grep "define('MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "" ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite is not configured for Multisite"
+echo "-------------------------------------------------------------------------"
+echo "Please setup Multisite first !"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+fi
+
+
+if [ "$(grep "define('MULTISITE', true);" /home/$domainMutilsite/public_html/wp-config.php)" == "" ]; then
+clear
+echo "========================================================================="
+echo "$domainMutilsite is not configured for Multisite"
+echo "-------------------------------------------------------------------------"
+echo "Please setup Multisite first!"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+
+echo "========================================================================="
+echo "Type in SUB (without domain) created in $domainMutilsite wp-admin. "
+echo "-------------------------------------------------------------------------"
+echo "Example: If you want create ok.vpssim.com, you type: ok"
+echo "========================================================================="
+echo -n "Type in the sub name: "
+read subdomain
+if [ "$subdomain" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately "
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+kiemtradata="^[a-zA-Z0-9][-a-zA-Z0-9]{0,61}[a-zA-Z0-9]$";
+if [[ ! "$subdomain" =~ $kiemtradata ]]; then
+	subdomain=`echo $subdomain | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$subdomain is wrong! You must use numbers and letters only. "
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi 
+
+
+if [ -f /etc/nginx/conf.d/$subdomain.$domainMutilsite.conf ]; then
+clear
+echo "========================================================================="
+echo "$subdomain.$domainMutilsite is actived on VPS "
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi
+
+echo "Please wait..."
+sleep 3
+
+ cat > "/etc/nginx/conf.d/$subdomain.$domainMutilsite.conf" <<END
+server {
+	    server_name www.$subdomain.$domainMutilsite;
+	    rewrite ^(.*) http://$subdomain.$domainMutilsite\$1 permanent;
+    	}
+server {
+	    listen   80;
+
+    	access_log off;
+    	error_log off;
+    	# error_log /home/$domainMutilsite/logs/error.log;
+    	root /home/$domainMutilsite/public_html;
+include /etc/nginx/conf/ddos2.conf;
+	index index.php index.html index.htm;
+    	server_name $subdomain.$domainMutilsite;
+
+#///////////////////////////////////////////////////////
+#///////////////////////////////////////////////////////
+#Run all the websites,if you use your rule, comment or delete the line below (AAA)
+#include /etc/nginx/conf/all.conf;
+
+#If you use your rule, comment or delete above line, and  Uncoment 3 lines belows and set your rule within it..
+#location / {
+#Uncomment 3 lines and set your rules here!
+#}
+
+#config for wordpress + Plugin super cache, If you run wordpress, uncomment the line below and comment out the line below the AAA
+include /etc/nginx/conf/supercache.conf;  
+
+#Do not delete the bottom line, if you delete google pagespeed function will not work!!
+#include /etc/nginx/ngx_pagespeed.conf;
+
+#security, sql injection Propeller ....(uncoment if you want to use). Because some website plugins do not run with this config, so VPSSIM to turn off default
+#include /etc/nginx/conf/block.conf;
+    	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        	include /etc/nginx/fastcgi_params;
+        	fastcgi_pass 127.0.0.1:9000;
+        	fastcgi_index index.php;
+		fastcgi_connect_timeout 60;
+		fastcgi_send_timeout 180;
+		fastcgi_read_timeout 180;
+		fastcgi_buffer_size 256k;
+		fastcgi_buffers 4 256k;
+		fastcgi_busy_buffers_size 256k;
+		fastcgi_temp_file_write_size 256k;
+		fastcgi_intercept_errors on;
+        	fastcgi_param SCRIPT_FILENAME /home/$domainMutilsite/public_html\$fastcgi_script_name;
+    	}
+	
+include /etc/nginx/conf/staticfiles.conf;
+#include /etc/nginx/conf/phpstatus.conf;
+include /etc/nginx/conf/drop.conf;
+#include /etc/nginx/conf/errorpage.conf;
+    }
+END
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service nginx restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart nginx.service
+fi
+echo "done...."
+sleep 2
+clear
+echo "========================================================================="
+echo "Successful actived the sub $subdomain.$domainMutilsite ! "
+echo "-------------------------------------------------------------------------"
+echo "You can access $subdomain.$domainMutilsite to check! If you made a wrong,"
+echo "-------------------------------------------------------------------------"
+echo "Delete $subdomain.$domainMutilsite.conf in /etc/nginx/conf.d"
+echo "-------------------------------------------------------------------------"
+echo "And start over!"
+/etc/vpssim/menu/wordpress-multi/vpssim-wordpress-multisite-menu
+exit
+fi

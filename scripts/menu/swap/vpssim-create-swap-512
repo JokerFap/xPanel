@@ -1,0 +1,16 @@
+#!/bin/bash
+dd if=/dev/zero of=/swapfile bs=1024 count=512k 
+mkswap /swapfile  
+swapon /swapfile
+chown root:root /swapfile 
+chmod 0600 /swapfile 
+if [ "$(grep "/swapfile    none    swap    sw    0    0" /etc/fstab | awk '{print $1}')" == "" ]; then
+echo "/swapfile    none    swap    sw    0    0" >> /etc/fstab  
+fi
+clear 
+echo "========================================================================= "
+echo "Successfully created Swap: $( free -m | awk 'NR==4 {print $2}' ) MB"
+/etc/vpssim/menu/swap/vpssim-them-swap-menu
+exit
+fi
+

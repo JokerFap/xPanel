@@ -1,0 +1,65 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+
+if [ -f /etc/php.d/imagick.ini ]; then
+echo "========================================================================="
+echo "Imagick is installed in your VPS !"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to remove it ?  [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+rm -r -f /etc/php.d/imagick.ini 
+pecl uninstall imagick
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service php-fpm restart
+echo "-------------------------------------------------------------------------"
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart php-fpm.service
+fi
+clear
+echo "========================================================================="
+
+	echo "Uninstall Imagick successfully !"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+    *)
+       clear
+    echo "========================================================================="
+   echo "You cancel remove IMAGICK"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+esac
+exit
+fi
+echo "========================================================================="
+echo "Imagick is not installed !"
+echo "-------------------------------------------------------------------------"
+read -r -p "Do you want to install it ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+	clear
+echo "========================================================================="
+echo "Next, do not type anything and press [Enter] when see sections below"
+echo "-------------------------------------------------------------------------"
+echo "Please provide the prefix of Imagemagick installation [autodetect] :"
+echo "========================================================================="
+read -p "Press [Enter] to continue ..."
+pecl install imagick
+echo "extension=imagick.so" > /etc/php.d/imagick.ini
+clear
+clear
+echo "========================================================================="
+echo "You have finished install IMAGICK"
+/etc/vpssim/menu/vpssim-tien-ich
+       ;;
+    *)
+    clear
+    echo "========================================================================="
+   echo "You cancel install IMAGICK"
+/etc/vpssim/menu/vpssim-tien-ich
+        ;;
+esac
+exit
+fi

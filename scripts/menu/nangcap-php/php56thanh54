@@ -1,0 +1,238 @@
+#!/bin/bash
+. /home/vpssim.conf
+echo "========================================================================="
+echo "When upgrade / downgrade php, Imagick & Iconcube will be removed"
+echo "If you are using it, please re-install it on [Tools - Addons]"
+echo "-------------------------------------------------------------------------"
+read -r -p "You want to downgrade PHP version from 5.6 to 5.4 ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+echo "Ok ! please wait ...."
+sleep 2
+if [ -f /etc/php.d/ioncube.ini ]; then
+rm -r -f /etc/php.d/*.ioncube.*
+rm -r -f /etc/php.d/ioncube.*
+rm -r -f /usr/local/ioncube
+fi
+mkdir -p /root/updown
+cp /etc/php-fpm.conf /root/updown/
+if [ -f /etc/php.d/opcache.bak ]; then
+cp /etc/php.d/opcache.bak /root/updown/
+fi
+if [ -f /etc/php.d/opcache.ini ]; then
+cp /etc/php.d/opcache.ini /root/updown/
+fi
+cp /etc/php.ini /root/updown/
+cp /etc/php-fpm.d/www.conf /root/updown
+if [ -f /etc/php.d/imagick.ini ]; then
+rm -r -f /etc/php.d/imagick.ini 
+pecl uninstall imagick
+fi
+yum -y --enablerepo=remi,remi-php56 remove php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+
+#KHoi dong lai nginx
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service nginx restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart nginx.service
+fi
+
+#yyyyyyyyyyyyyyyyyyyyyy
+
+yum -y --enablerepo=remi,remi-php54 install php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+
+
+#edit php.ini va Zend opcache
+rm -r -f /etc/php.ini  
+rm -r -f /etc/php.d/*opcache*
+rm -r -f /etc/php-fpm.conf
+rm -r -f /etc/vpssim/php56
+cp /root/updown/php-fpm.conf /etc/
+cp /root/updown/php.ini /etc/
+cp /root/updown/www.conf /etc/php-fpm.d/
+#copy opcache.bak
+
+if [ -f /root/updown/opcache.bak ]; then
+rm -r -f /etc/php.d/*opcache*
+cat > "/etc/php.d/opcache.bak" <<END
+zend_extension=/usr/lib64/php/modules/opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=40
+opcache.interned_strings_buffer=16
+opcache.max_accelerated_files=3000
+opcache.max_wasted_percentage=5
+opcache.use_cwd=1
+opcache.validate_timestamps=1
+opcache.revalidate_freq=999999999
+opcache.fast_shutdown=1
+END
+fi
+#copy opcache.ini
+if [ -f /root/updown/opcache.ini ]; then
+rm -r -f /etc/php.d/*opcache*
+cat > "/etc/php.d/opcache.ini" <<END
+zend_extension=/usr/lib64/php/modules/opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=40
+opcache.interned_strings_buffer=16
+opcache.max_accelerated_files=3000
+opcache.max_wasted_percentage=5
+opcache.use_cwd=1
+opcache.validate_timestamps=1
+opcache.revalidate_freq=999999999
+opcache.fast_shutdown=1
+END
+fi
+rm -r -f /root/updown/
+rm -r -f /etc/vpssim/opcache.conf
+cat > "/etc/vpssim/opcache.conf" <<END
+opcachesize="40"
+opcachephpmax="3000"
+END
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service nginx restart
+service php-fpm restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart nginx.service
+systemctl restart php-fpm.service
+fi
+
+chmod 777 /var/lib/php/session/
+clear
+if [ -f /etc/php.d/opcache.ini ]; then
+echo "========================================================================="
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')" == "stopped" ]; then
+echo "PHP-FPM can not Start !"
+fi
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $5}')" == "running..." ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "inactive" ]; then
+echo "PHP-FPM Stopped !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "failed" ]; then
+echo "PHP-FPM Can not Start !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "active" ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+echo "Zend Opcache is restored  to the default values with RAM use: 40 MB"
+echo "You need re-config in [Opcache Manage] "
+vpssim
+fi
+if [ -f /etc/php.d/opcache.bak ]; then
+echo "========================================================================="
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')" == "stopped" ]; then
+echo "PHP-FPM can not Start !"
+fi
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $5}')" == "running..." ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "inactive" ]; then
+echo "PHP-FPM Stopped !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "failed" ]; then
+echo "PHP-FPM Can not Start !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "active" ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+echo "-------------------------------------------------------------------------"
+echo "Zend OPcache is diables in VPS"
+echo "-------------------------------------------------------------------------"
+echo "Lets enable Zend Opcache to get the best VPS productivity."
+vpssim
+fi
+echo "========================================================================="
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')" == "stopped" ]; then
+echo "PHP-FPM can not Start !"
+fi
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $5}')" == "running..." ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "inactive" ]; then
+echo "PHP-FPM Stopped !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "failed" ]; then
+echo "PHP-FPM Can not Start !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "active" ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+vpssim
+  ;;
+    *)
+    clear
+    echo "========================================================================="
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')" == "stopped" ]; then
+echo "PHP-FPM can not Start !"
+fi
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $5}')" == "running..." ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "inactive" ]; then
+echo "PHP-FPM Stopped !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "failed" ]; then
+echo "PHP-FPM Can not Start !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "active" ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+vpssim
+        ;;
+esac
+clear
+    echo "========================================================================="
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $3}')" == "stopped" ]; then
+echo "PHP-FPM can not Start !"
+fi
+if [ "$(/sbin/service php-fpm status | awk 'NR==1 {print $5}')" == "running..." ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "inactive" ]; then
+echo "PHP-FPM Stopped !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "failed" ]; then
+echo "PHP-FPM Can not Start !"
+fi
+if [ "$(/bin/systemctl status  php-fpm.service | awk 'NR==3 {print $2}')" == "active" ]; then
+printf "Your Current PHP Version is: $(php -i | grep 'PHP Version' | awk 'NR==1 {print $4}')                          \n"
+fi
+fi
+vpssim
+exit
+fi

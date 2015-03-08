@@ -1,0 +1,114 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+echo "========================================================================="
+echo -n "Type in the website you want to backup code [ENTER]: " 
+read website
+if [ "$website" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$website" =~ $kiemtradomain3 ]]; then
+	website=`echo $website | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$website maybe not a domain name!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi
+
+
+if [ -f /home/$website/public_html/index.php ]; then
+echo "-------------------------------------------------------------------------"
+echo "Discovered $website on server"
+echo "-------------------------------------------------------------------------"
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read backuphomename
+if [ "$backuphomename" = "" ]; then
+clear
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi
+
+if [[ ! ${#backuphomename} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your backup more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi  
+
+if [ -f /home/$mainsite/private_html/backup/$website/*.zip ]; then
+echo "-------------------------------------------------------------------------"
+echo "Discovered $website was backuped"
+echo "-------------------------------------------------------------------------"
+read -r -p "Delete it and create the new backup file? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+	echo "we are backing up $website, please wait..."
+	cd /home/$website/public_html/
+	zip -r $website.zip *
+	rm -rf /home/$mainsite/private_html/backup/$website/
+	mkdir -p /home/$mainsite/private_html/backup/$website/
+	mv $website.zip /home/$mainsite/private_html/backup/$website/$website-$backuphomename.zip
+
+clear
+echo "========================================================================="
+echo "Link file backup:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/$website/$website-$backuphomename.zip"
+echo "-------------------------------------------------------------------------"
+echo "If $mainsite use cloudflare, use this link:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/$website/$website-$backuphomename.zip"
+/etc/vpssim/menu/vpssim-sao-luu
+echo "Done... "
+        ;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+clear
+echo "========================================================================="
+echo "Cancel create new backup."
+/etc/vpssim/menu/vpssim-sao-luu
+else
+	echo "we are backing up $website, please wait...."
+	cd /home/$website/public_html/
+	zip -r $website.zip *
+	rm -rf /home/$mainsite/private_html/backup/$website/
+	mkdir -p /home/$mainsite/private_html/backup/$website/
+	mv $website.zip /home/$mainsite/private_html/backup/$website/$website-$backuphomename.zip
+echo "Done... "
+clear
+clear
+echo "========================================================================="
+echo "Link file backup:"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/backup/$website/$website-$backuphomename.zip"
+echo "-------------------------------------------------------------------------"
+echo "If $mainsite use cloudflare, use this link :"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/backup/$website/$website-$backuphomename.zip"
+/etc/vpssim/menu/vpssim-sao-luu
+fi
+else
+clear
+echo "========================================================================="
+echo "Sorry, we can not find out $website"
+echo "-------------------------------------------------------------------------"
+echo "or $website has not data on it"
+/etc/vpssim/menu/vpssim-sao-luu
+exit
+fi

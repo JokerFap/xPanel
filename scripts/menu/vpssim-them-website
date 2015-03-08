@@ -1,0 +1,194 @@
+#!/bin/bash 
+
+. /home/vpssim.conf
+echo "========================================================================="
+echo -n "Type in domain you want to add to server [ENTER]: " 
+read website
+if [ "$website" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please type in accurately!"
+/etc/vpssim/menu/vpssim-them-website-menu
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$website" =~ $kiemtradomain3 ]]; then
+	website=`echo $website | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$website maybe not a domain name!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/vpssim/menu/vpssim-them-website-menu
+exit
+fi
+
+
+if [ -f /etc/nginx/conf.d/$website.conf ]; then
+clear
+echo "========================================================================="
+echo "Discover that $website is existed in the system!"
+/etc/vpssim/menu/vpssim-them-website-menu
+exit
+fi
+    mkdir -p "/home/$website/public_html"
+    \cp -uf /etc/vpssim/menu/robots.txt "/home/$website/public_html/"
+chown -R nginx:nginx "/home/$website/public_html/"
+find "/home/$website/public_html/" -type d -exec chmod g+s {} \;
+    mkdir -p "/home/$website/logs"
+cat > "/home/$website/public_html/index.html" <<END
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>Add $website to server successful !</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style type="text/css">
+			/*<![CDATA[*/
+			body {
+				background-color: #fff;
+				color: #000;
+				font-size: 0.9em;
+				font-family: sans-serif,helvetica;
+				margin: 0;
+				padding: 0;
+			}
+		 h1 {
+				text-align: center;
+				margin: 0;
+				padding: 0.6em 2em 0.4em;
+				background-color: #22437f;
+				color: #fff;
+				font-weight: normal;
+				font-size: 1.75em;
+				border-bottom: 2px solid #000;
+			}
+			h1 strong {
+				font-weight: bold;
+			}
+			/*]]>*/
+		</style>
+	</head>
+	<body>
+		<h1><strong>Add $website to server successful !</strong></h1>
+			</body>
+</html>
+END
+
+    cat > "/etc/nginx/conf.d/$website.conf" <<END
+server {
+	    server_name www.$website;
+	    rewrite ^(.*) http://$website\$1 permanent;
+    	}
+server {
+	    listen   80;
+
+    	access_log off;
+    	error_log off;
+    	# error_log /home/$website/logs/error.log;
+    	root /home/$website/public_html;
+include /etc/nginx/conf/ddos2.conf;
+ 	index index.php index.html index.htm;
+    	server_name $website;
+
+#///////////////////////////////////////////////////////
+#///////////////////////////////////////////////////////
+#Run all the websites,if you use your rule, comment or delete the line below (AAA)
+include /etc/nginx/conf/all.conf;
+
+#If you use your rule, comment or delete above line, and  Uncoment 3 lines belows and set your rule within it..
+#location / {
+#Uncomment 3 lines and set your rules here!
+#}
+
+#config for wordpress + Plugin super cache, If you run wordpress, uncomment the line below and comment out the line below the AAA
+#include /etc/nginx/conf/supercache.conf;  
+
+#Do not delete the bottom line, if you delete google pagespeed function will not work!!
+#include /etc/nginx/ngx_pagespeed.conf;
+
+#security, sql injection Propeller ....(uncoment if you want to use). Because some website plugins do not run with this config, so VPSSIM to turn off default
+#include /etc/nginx/conf/block.conf;
+
+    	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        	include /etc/nginx/fastcgi_params;
+        	fastcgi_pass 127.0.0.1:9000;
+        	fastcgi_index index.php;
+		fastcgi_connect_timeout 60;
+		fastcgi_send_timeout 180;
+		fastcgi_read_timeout 180;
+		fastcgi_buffer_size 256k;
+		fastcgi_buffers 4 256k;
+		fastcgi_busy_buffers_size 256k;
+		fastcgi_temp_file_write_size 256k;
+		fastcgi_intercept_errors on;
+        	fastcgi_param SCRIPT_FILENAME /home/$website/public_html\$fastcgi_script_name;
+    	}
+include /etc/nginx/conf/staticfiles.conf;
+#include /etc/nginx/conf/phpstatus.conf;
+include /etc/nginx/conf/drop.conf;
+#include /etc/nginx/conf/errorpage.conf;
+    }
+END
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service nginx restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart nginx.service
+fi
+echo "$website" > /tmp/databasename.txt
+sed -i 's/\./_/g' /tmp/databasename.txt
+dataname=`cat /tmp/databasename.txt`_`date |md5sum |cut -c '1-2'`
+username=`date |md5sum |cut -c '2-13'`
+password=`date |md5sum |cut -c '14-30'`
+rm -rf /tmp/databasename.txt
+cat > "/tmp/config.temp" <<END
+CREATE DATABASE $dataname COLLATE utf8_general_ci;
+END
+
+mysql -u root -p$mariadbpass < /tmp/config.temp
+rm -f /tmp/config.temp
+
+ cat > "/tmp/config.temp" <<END
+CREATE USER '$username'@'localhost' IDENTIFIED BY '$password';
+END
+
+	mysql -u root -p$mariadbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+    cat > "/tmp/config.temp" <<END
+GRANT ALL PRIVILEGES ON $dataname . * TO '$username'@'localhost';
+END
+	mysql -u root -p$mariadbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+    cat > "/tmp/config.temp" <<END
+FLUSH PRIVILEGES;
+END
+	mysql -u root -p$mariadbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Database: $dataname - Created on: $(date +%d/%m/%Y) when add $website to VPS" >> /home/DBinfo.txt
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Data name: $dataname" >> /home/DBinfo.txt
+echo "Username: $username" >> /home/DBinfo.txt
+echo "password: $password" >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+
+clear
+echo "========================================================================="
+echo "$website is added successful to server"
+echo "-------------------------------------------------------------------------"
+echo "Upload code to /home/$website/public_html"
+echo "-------------------------------------------------------------------------"
+echo "Database auto created by VPSSIM for $website :"
+echo "-------------------------------------------------------------------------"
+echo "Database: $dataname"
+echo "User name: $username" 
+echo "Password: $password"
+echo "-------------------------------------------------------------------------"
+echo "Database's infomation saved in: /home/DBinfo.txt"
+/etc/vpssim/menu/vpssim-them-website-menu
+exit
+fi

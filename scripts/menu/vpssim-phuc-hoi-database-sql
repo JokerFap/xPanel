@@ -1,0 +1,119 @@
+#!/bin/sh
+clear
+echo "========================================================================="
+echo "            VPSSIM - Manage VPS/Server by VPSSIM.COM                "
+echo "========================================================================="
+echo "                      Restore Database                             "
+echo "========================================================================="
+echo""
+echo ""
+echo "File Backup Database must be  *.SQL"
+echo "If using other formats, this function will not work correctly"
+echo "========================================================================="
+echo "You must create the database before recovering "
+echo "Create Database in [Database Manage]"
+echo "-------------------------------------------------------------------------"
+read -r -p "You have created the database before recovering ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+clear
+echo "-------------------------------------------------------------------------"
+echo "Prepare the database recovery process ... "
+echo "-------------------------------------------------------------------------"
+sleep 3
+echo -n "Type in the database you want to restore [ENTER]: " 
+read namedatabase
+if [ "$namedatabase" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+#ten database
+if [ ! -f /var/lib/mysql/$namedatabase/db.opt ]; then
+clear
+echo "========================================================================="
+echo "Did not find out $namedatabase on server  "
+echo "-------------------------------------------------------------------------"
+echo "please check again!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+du -sh /var/lib/mysql/$namedatabase | awk 'NR==1 {print $1}'> /tmp/vpssim1
+echo "-------------------------------------------------------------------------"
+echo -n "Type user of Database [ENTER]: " 
+read userdatabase
+if [ "$userdatabase" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+echo "-------------------------------------------------------------------------"
+echo -n "Type the password of Database [ENTER]: " 
+read passdatabase
+if [ "$passdatabase" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+echo "========================================================================="
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database-phuc-hoi-database
+exit
+fi
+echo "========================================================================="
+echo "Type the path of Database backup file"
+echo "For simplicity , you should upload the backup file to Home folder"
+echo "Database backup path will be similar: /home/hostingaz.sql"
+echo "========================================================================="
+echo -n "Type the path of Database backup file [ENTER]: " 
+read dddatabase
+if [ "$dddatabase" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+if [ ! -f $dddatabase ]; then
+clear
+echo "========================================================================="
+echo "Link backup of $namedatabase incorrect, please check back!"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+mysql -u $userdatabase -p$passdatabase $namedatabase < $dddatabase
+du -sh /var/lib/mysql/$namedatabase | awk 'NR==1 {print $1}'> /tmp/vpssim2
+check1=`cat /tmp/vpssim1`
+check2=`cat /tmp/vpssim2`
+if [ "$check1" == "$check2" ]; then
+rm -rf /tmp/vpssim1
+rm -rf /tmp/vpssim2
+clear
+echo "========================================================================="
+echo "Restore database $namedatabase failed "
+echo "-------------------------------------------------------------------------"
+echo "Please check file backup's format and $namedatabase's infomation"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+else
+rm -rf /tmp/vpssim1
+rm -rf /tmp/vpssim2
+clear
+echo "========================================================================="
+echo "Restored database $namedatabase successfully !"
+/etc/vpssim/menu/vpssim-sao-luu-phuc-hoi-database
+exit
+fi
+;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+echo "========================================================================="
+echo "Please create Database before you restore from the backup file"
+/etc/vpssim/menu/vpssim-them-xoa-database
+exit
+fi
+

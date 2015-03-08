@@ -1,0 +1,31 @@
+#!/bin/bash
+prompt="Type in your choice:"
+options=("Create Swap" "Delete Swap")
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "    This function only support VPS KVM & XEN And Swap MAX = 2X RAM\n"
+printf "=========================================================================\n"
+test_swap=$(free -m | awk 'NR==4 {print $2}')
+if [ "$test_swap" == "0" ]; then
+printf "                       Swap Manage - Swap: 0 MB \n"
+else
+printf "                     Swap Manage - Swap: $( free -m | awk 'NR==4 {print $2}' ) MB \n"
+fi
+
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" "Exit"; do 
+
+    case "$REPLY" in
+
+    1 ) clear && /etc/vpssim/menu/swap/vpssim-them-swap-vps;;
+    2 ) /etc/vpssim/menu/swap/vpssim-xoa-swap-vps;;
+  
+$(( ${#options[@]}+1 )) ) echo "";  clear && /bin/vpssim;;
+     *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done

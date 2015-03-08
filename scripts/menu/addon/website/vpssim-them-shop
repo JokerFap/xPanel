@@ -1,0 +1,31 @@
+#!/bin/bash
+prompt="Type in your choice (8-Exit):"
+options=( "Add Website + Opencart" "Add Website + Oscommerce" "Add Website + Prestashop 1.5 " "Add Website + Prestashop 1.6 " "Add Website + TomatoCart" "Add Website + Zencart" "Add Website + ZeusCart" "Exit")
+printf "=========================================================================\n"
+printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                      Add Website + Code shop \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+
+1) rm -r -f website-opencart && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-opencart && chmod +x website-opencart && clear &&./website-opencart;;
+2) rm -r -f website-oscommerce && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-oscommerce && chmod +x website-oscommerce && clear &&./website-oscommerce;;
+3) rm -r -f website-Prestashop-1.5 && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-Prestashop-1.5 && chmod +x website-Prestashop-1.5 && clear &&./website-Prestashop-1.5;;
+4) rm -r -f website-Prestashop-1.6 && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-Prestashop-1.6 && chmod +x website-Prestashop-1.6 && clear &&./website-Prestashop-1.6;;
+5) rm -r -f website-TomatoCart && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-TomatoCart && chmod +x website-TomatoCart && clear &&./website-TomatoCart;;
+6) rm -r -f website-zencart && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-zencart && chmod +x website-zencart && clear &&./website-zencart;;
+7) rm -r -f website-ZeusCart && wget -q http://vpssim.com/script/vpssim/addon/website/shop/website-ZeusCart && chmod +x website-ZeusCart && clear &&./website-ZeusCart;;
+8) clear && /etc/vpssim/menu/vpssim-them-website-menu;;
+        *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+
+
+

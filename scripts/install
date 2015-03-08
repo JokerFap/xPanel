@@ -1,0 +1,80 @@
+#!/bin/sh
+if [ -f /etc/yum.repos.d/epel.repo ]
+then
+sudo sed -i "s/mirrorlist=https/mirrorlist=http/" /etc/yum.repos.d/epel.repo
+fi
+if [ ! -f /bin/calc ]
+then
+wget -q http://vpssim.com/script/vpssim/calc -O /bin/calc && chmod +x /bin/calc
+yum -y install psmisc bc gawk gcc sendmail
+yum -y -q install virt-what unzip sudo net-tools iproute iproute2
+fi
+if [ $(id -u) != "0" ]; then
+    printf "Error: You have to login by user root!\n"
+    exit
+fi
+
+if [ -f /var/cpanel/cpanel.config ]; then
+echo "Your Server installed WHM/Cpanel, if you want to use  VPSSIM"
+echo "Lets rebuild VPS, you should use centos 6 or 7 - 64 bit"
+echo "Bye !"
+exit
+fi
+
+if [ -f /etc/psa/.psa.shadow ]; then
+echo "Server installed Plesk, if you want to use VPSSIM"
+echo "Lets rebuild VPS, you should use centos 6 or 7 - 64 bit"
+echo "Bye !"
+exit
+fi
+
+if [ -f /etc/init.d/directadmin ]; then
+echo "Your Server installed DirectAdmin, if you want to use VPSSIM"
+echo "Lets rebuild VPS, you should use centos 6 or 7 - 64 bit"
+echo "Bye !"
+exit
+fi
+
+if [ -f /etc/init.d/webmin ]; then
+echo "Your Server installed webmin, if you want to use VPSSIM"
+echo "Lets rebuild VPS, you should use centos 6 or 7 - 64 bit"
+echo "Bye !"
+exit
+fi
+
+if [ -f /home/vpssim.conf ]; then
+clear
+echo "========================================================================="
+echo "========================================================================="
+echo "Your Server is installed VPSSIM"
+echo "Use command  vpssim  to access VPSSIM menu"
+echo "Bye !"
+echo "========================================================================="
+echo "========================================================================="
+rm -r -f install
+exit
+fi
+clear
+prompt="Type in your choice:"
+options=( "PHP 5.6" "PHP 5.5" "PHP 5.4" "Exit" )
+echo "========================================================================="
+echo "                VPSSIM - Manage VPS/Server by VPSSIM.COM               "
+echo "========================================================================="
+echo "                          VPSSIM Setup Menu                                 "
+echo "========================================================================="
+echo "                      Please choose PHP version           "
+echo "========================================================================="
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+    1) clear && rm -r -f vpssim56 && wget -q http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/vpssim56 && chmod +x vpssim56 && clear && ./vpssim56;;
+    2) clear && rm -r -f vpssim55 && wget -q http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/vpssim55 && chmod +x vpssim55 && clear &&  ./vpssim55;;
+    3) clear && rm -r -f vpssim54 && wget -q http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/vpssim54 && chmod +x vpssim54 && clear && ./vpssim54;;
+    4) clear && echo "You cancle setup VPSSIM on this server!" && rm -r -f install && killall -g install;;    
+    *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done

@@ -1,0 +1,5 @@
+#!/bin/sh
+clear
+echo "========================================================================="
+echo "Amount of connections to 80 Port: $(netstat -n | grep :80 |wc -l)"
+/etc/vpssim/menu/vpssim-kiem-tra-ddos

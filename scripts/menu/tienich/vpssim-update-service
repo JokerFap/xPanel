@@ -1,0 +1,25 @@
+#!/bin/bash
+prompt="Type in your choice:"
+options=( "Update System" "Update Nginx" "Exit" )
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM \n"
+printf "=========================================================================\n"
+printf "                        Update System & Service\n"
+printf "=========================================================================\n"
+printf "                   Last update system: $(sed -n '/Updated:/h;${;g;p;}' < /var/log/yum.log | awk '{print $1,$2,$3}')\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+
+    1) /etc/vpssim/menu/update-he-thong;;
+    2) /etc/vpssim/menu/vpssim-nang-cap-nginx;;
+    3) clear && /etc/vpssim/menu/vpssim-tien-ich;;
+
+            *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+done

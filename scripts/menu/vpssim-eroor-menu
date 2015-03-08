@@ -1,0 +1,33 @@
+#!/bin/sh
+. /home/vpssim.conf
+prompt="Type in your choice(11-Exit):"
+options=("Nginx Log" "Boot Log" "Cronjob Log" "Secure Log" "PHP-FPM Log" "PHP-FPM slow Log" "MySQL Log" "MySQL Slow Log" "Delete all link download LOG " "Fix Can't download Log files" "Exit")
+printf "=========================================================================\n"
+printf "                VPSSIM - Manage VPS/Server by VPSSIM.COM              \n"
+printf "=========================================================================\n"
+printf "                         VPSSIM - Download Log                           \n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+    case "$REPLY" in
+
+    1) /etc/vpssim/menu/downloadlog/vpssim-download-log-nginx;;
+    2) /etc/vpssim/menu/downloadlog/vpssim-download-log-boot;;
+    3) /etc/vpssim/menu/downloadlog/vpssim-download-log-cron;;
+    4) /etc/vpssim/menu/downloadlog/vpssim-download-log-secure;;
+    5) /etc/vpssim/menu/downloadlog/vpssim-download-log-php-fpm;;
+    6) /etc/vpssim/menu/downloadlog/vpssim-download-log-php-fpm-slow;;
+    7) /etc/vpssim/menu/downloadlog/vpssim-download-log-mysql;;
+    8) /etc/vpssim/menu/downloadlog/vpssim-download-log-mysql-slow;;
+    9) /etc/vpssim/menu/downloadlog/vpssim-xoa-link-log;;
+    10) /etc/vpssim/menu/downloadlog/vpssim-khong-the-download-log;;
+    11) clear && /bin/vpssim;;  
+    *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+
+    esac
+
+done
+
+ 

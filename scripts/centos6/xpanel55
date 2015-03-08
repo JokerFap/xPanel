@@ -37,7 +37,7 @@ clear
    echo -e "******************** YOUR DOMAIN CAN NOT BE VACATED ! ********************"
 
    
-./vpssim55
+./xpanel55
 exit
 fi
 
@@ -49,7 +49,7 @@ echo "========================================================================="
 echo "$svdomain maybe not a domain name!"
 echo "-------------------------------------------------------------------------"
 echo "Please try again !"
-./vpssim55
+./xpanel55
 exit
 fi
 echo -n "Type In Phpmyadmin Port [ENTER]: " 
@@ -61,9 +61,9 @@ echo "vpssim will set PMA port is 2313"
 fi
 if [ "$svport" = "" ] ; then
 clear
-    
- echo -e "****************** PHPMYADMIN PORT CAN NOT BE VACATED ! ******************"
-./vpssim55
+
+echo -e "****************** PHPMYADMIN PORT CAN NOT BE VACATED ! ******************"
+./xpanel55
 exit
 fi
 if ! [[ $svport -ge 1 && $svport -le 65535  ]] ; then  
@@ -74,7 +74,7 @@ echo "-------------------------------------------------------------------------"
 echo "The Port must be a number within range of (1 - 65535)."
 echo "-------------------------------------------------------------------------"
 echo "Please try again !" 
-./vpssim55
+./xpanel55
 exit
 fi 
 clear
@@ -122,13 +122,13 @@ fi
 
 arch=`uname -m`
 if [ "$arch" = "x86_64" ]; then
-rpm -Uvh http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo64/epel.rpm
-rpm -Uvh http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo64/remi.rpm
-wget -q http://vpssim.com/script/vpssim/centos6/repo64/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
+rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo64/epel.rpm
+rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo64/remi.rpm
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos6/repo64/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
 else
-rpm -Uvh http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo32/epel.rpm
-rpm -Uvh http://vpssim.com/script/vpssim/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo32/remi.rpm
-wget -q http://vpssim.com/script/vpssim/centos6/repo32/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
+rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo32/epel.rpm
+rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo32/remi.rpm
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos6/repo32/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
 fi
 if [ -f /etc/yum.repos.d/epel.repo ]
 then
@@ -162,9 +162,9 @@ sudo yum -y install gcc gcc-c++ pcre-dev pcre-devel zlib-devel expect imake lsof
 sudo yum -y install unzip zip rar unrar rsync psmisc
 cd
 cd /usr/local/vpssim
-wget -q http://vpssim.com/script/vpssim/module-nginx/Nginx-accesskey-2.0.3.tar.gz
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx/Nginx-accesskey-2.0.3.tar.gz
 tar -xzf Nginx-accesskey-2.0.3.tar.gz
-wget -q http://vpssim.com/script/vpssim/module-nginx/ngx_cache_purge-2.3.tar.gz
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx//ngx_cache_purge-2.3.tar.gz
 tar -xzf ngx_cache_purge-2.3.tar.gz
 cd
 cd /usr/local/vpssim
@@ -189,8 +189,8 @@ rm -f /etc/init.d/nginx
 wget -q http://vpssim.com/script/vpssim/nginx -O /etc/init.d/nginx && chmod +x /etc/init.d/nginx
 yum -y install MariaDB-server MariaDB-client exim syslog-ng cronie
 yum -y --enablerepo=remi,remi-php55 install php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
-yum -y install memcached 
-yum -y install ImageMagick* 
+yum -y install memcached
+yum -y install ImageMagick*
 clear
 printf "=========================================================================\n"
 printf "Installation is complete, start the configuration... \n"
@@ -226,7 +226,7 @@ service syslog-ng start
 mkdir -p /home/sim.$svdomain/public_html
 cd /home/sim.$svdomain/public_html
 #wget http://hostingaz.vn/script/vpssim/robots.txt
-wget -q http://vpssim.com/script/vpssim/html/install/index.html
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/html/index.html
 cd
 mkdir -p /home/sim.$svdomain/private_html
 
@@ -829,8 +829,8 @@ rm -f /var/lib/mysql/ibdata1
 
 
 rm -f /bin/mysql_secure_installation
-wget -q http://vpssim.com/script/vpssim/mysql_secure_installation -O /bin/mysql_secure_installation && chmod +x /bin/mysql_secure_installation
-wget -q http://vpssim.com/script/vpssim/auto-start-mysql -O /bin/auto-start-mysql && chmod +x /bin/auto-start-mysql
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/mysql/mysql_secure_installation -O /bin/mysql_secure_installation && chmod +x /bin/mysql_secure_installation
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/mysql/auto-start-mysql -O /bin/auto-start-mysql && chmod +x /bin/auto-start-mysql
 clear
 printf "=========================================================================\n"
 printf "Set Root Password MySQL ... \n"
@@ -845,7 +845,7 @@ printf "========================================================================
 sleep 2
 cd /home/sim.$svdomain/private_html/
 wget -q https://gist.github.com/ck-on/4959032/raw/0b871b345fd6cfcd6d2be030c1f33d1ad6a475cb/ocp.php
-wget -q http://vpssim.com/script/vpssim/memcache.php.zip -O /home/sim.$svdomain/private_html/memcache.php
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/memcache.php -O /home/sim.$svdomain/private_html/memcache.php
 wget -q http://jaist.dl.sourceforge.net/project/phpmyadmin/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.zip
 unzip -q phpMyAdmin-*.zip
 yes | cp -rf phpMyAdmin-*/* .
@@ -871,9 +871,9 @@ printf "========================================================================
 printf "Creating VPSSIM menu...... \n"
 printf "=========================================================================\n"
 rm -r -f /etc/motd
-wget -q http://vpssim.com/script/vpssim/motd -O /etc/motd
-wget -q http://vpssim.com/script/vpssim/ngx_pagespeed.conf -O /etc/nginx/ngx_pagespeed.conf
-wget -q http://vpssim.com/script/vpssim/vpssim -O /bin/vpssim && chmod +x /bin/vpssim
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/motd -O /etc/motd
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/conf/ngx_pagespeed.conf -O /etc/nginx/ngx_pagespeed.conf
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/xpanel -O /bin/vpssim && chmod +x /bin/xpanel
 
 wget -q http://vpssim.com/script/vpssim/vpssim.version -O /etc/vpssim/vpssim.version && chmod +x /etc/vpssim/vpssim.version
 
@@ -917,7 +917,7 @@ fi
 chkconfig memcached on
 service memcached start
 rm -r -f /root/install
-rm -r -f /root/vpssim55
+rm -r -f /root/xpanel55
 rm -r -f /root/vpssim54
 rm -r -f /root/vpssim56
 echo "=========================================================================" > /home/VPSSIM-Setup-info.txt
@@ -969,9 +969,9 @@ exit
     *)
 printf "=========================================================================\n"
         echo "Please choose again..."
-        rm -r -f vpssim55 && ./install
+        rm -r -f xpanel55 && ./install
         ;;
 esac
 printf "=========================================================================\n"
         echo "Please choose again..."
-        rm -r -f vpssim55 && ./install
+        rm -r -f xpanel55 && ./install

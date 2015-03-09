@@ -90,6 +90,10 @@ read -r -p "Information Provided Is Accurate ? [y/N] " response
 case $response in
     [yY][eE][sS]|[yY]) 
 echo "Setup is starting ...."
+
+read -r -p "Use PHP FastCGI ? [y/N] " fastcgi
+read -r -p "Use MariaDB ? [y/N] " mariadb
+
 sleep 2
 clear
 echo "========================================================================="
@@ -113,7 +117,7 @@ echo "Command to call xPanel menu: xpanel"
 echo "-------------------------------------------------------------------------"
 echo "Only $svdomain added to VPS, so you have to go to xPanel menu"
 echo "-------------------------------------------------------------------------"
-echo "Use [Add website & Code] functions to add $svdomain to VPS ! "
+echo "Use [Add website] functions to add $svdomain to VPS ! "
 echo "========================================================================="
 read -p "Press [Enter] to continue ..."
 if [ -s /etc/selinux/config ]; then
@@ -124,11 +128,9 @@ arch=`uname -m`
 if [ "$arch" = "x86_64" ]; then
 rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo64/epel.rpm
 rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo64/remi.rpm
-wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos6/repo64/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
 else
 rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo32/epel.rpm
 rpm -Uvh https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))/repo32/remi.rpm
-wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos6/repo32/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
 fi
 if [ -f /etc/yum.repos.d/epel.repo ]
 then
@@ -160,6 +162,7 @@ groupadd nginx
 useradd -g nginx -d /dev/null -s /sbin/nologin nginx
 sudo yum -y install gcc gcc-c++ pcre-dev pcre-devel zlib-devel expect imake lsof autoconf nc libedit-devel make automake perl-libwww-perl tree virt-what cmake openssl-devel libxml2-devel libtool bind-utils libXext-devel cyrus-sasl-devel glib2 glib2-devel openssl bzip2 bzip2-devel flex bison libcurl-devel which libevent libevent-devel libxslt-devel gd gd-devel perl-ExtUtils-Embed patch sysstat libgcj gettext-devel vim-minimal nano cairo-devel libxml2-devel libpng-devel freetype freetype-devel libart_lgpl-devel  GeoIP-devel gperftools-devel libicu libicu-devel aspell aspell-devel libtidy libtidy-devel readline-devel iptables* libedit-devel enchant enchant-devel pam-devel git perl-ExtUtils-MakeMaker perl-Time-HiRes openldap-devel curl curl-devel diffutils libc-client libc-client-devel numactl lsof pkgconfig gdbm-devel tk-devel bluez-libs-devel
 sudo yum -y install unzip zip rar unrar rsync psmisc
+
 cd
 cd /usr/local/xpanel
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx/Nginx-accesskey-2.0.3.tar.gz
@@ -187,10 +190,48 @@ make
 make install
 rm -f /etc/init.d/nginx
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx/nginx -O /etc/init.d/nginx && chmod +x /etc/init.d/nginx
-yum -y install MariaDB-server MariaDB-client exim syslog-ng cronie
-yum -y --enablerepo=remi,remi-php55 install php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+
+
+case $mariadb in
+    [yY][eE][sS]|[yY]) 
+    if [ "$arch" = "x86_64" ]; then
+        wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos6/repo64/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
+    else
+        wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/centos6/repo32/MariaDB.repo -O /etc/yum.repos.d/MariaDB.repo
+    fi
+    yum -y install MariaDB-server MariaDB-client
+    service mysql start
+    chkconfig --add mysql
+    chkconfig --levels 235 mysql on
+    ;;
+    *) yum -y install mysql-server
+    service mysqld start
+    chkconfig --add mysqld
+    chkconfig --levels 235 mysqld on
+    ;;
+esac
+
+yum -y install exim syslog-ng cronie
 yum -y install memcached
 yum -y install ImageMagick*
+yum -y --enablerepo=remi,remi-php55 install php php-curl php-memcached php-memcache php-zts php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+
+sudo yum -y install httpd httpd-devel apr-devel apr mod_fastcgi mod_evasive
+sed -i 's/#HTTPD=\/usr\/sbin\/httpd.worker/HTTPD=\/usr\/sbin\/httpd.event/g' /etc/sysconfig/httpd
+sed -i 's/Listen 80/Listen 8088/g' /etc/httpd/conf/httpd.conf
+sed -i 's/#NameVirtualHost *:80/NameVirtualHost *:8088/g' /etc/httpd/conf/httpd.conf
+sed -i '$ a\Include vhost\/*.conf' /etc/httpd/conf/httpd.conf
+sed -i 's/KeepAlive Off/KeepAlive On/g' /etc/httpd/conf/httpd.conf
+mkdir /etc/httpd/vhost
+
+case $fastcgi in
+    [yY][eE][sS]|[yY]) 
+    yum -y --enablerepo=remi,remi-php55 install php-fpm
+    sed -i 's/FastCgiWrapper On/#FastCgiWrapper On/g' /etc/httpd/conf.d/fastcgi.conf
+    sed -i '$ a\AddHandler php-fastcgi .php\nAction php-fastcgi \/php5-fcgi\/php-fpm\nScriptAlias \/php5-fcgi\/ \/var\/www\/php5-fcgi\/\nFastCGIExternalServer \/var\/www\/php5-fcgi\/php-fpm -host 127.0.0.1:9000' /etc/httpd/conf.d/fastcgi.conf
+    ;;
+esac
+
 clear
 printf "=========================================================================\n"
 printf "Installation is complete, start the configuration... \n"
@@ -206,20 +247,15 @@ sleep 3
 	buff_size=$(calc $ramformariadb/10*8)M
 	log_size=$(calc $ramformariadb/10*2)M
 
-service httpd stop 
-chkconfig httpd off
-chkconfig --add mysql
-chkconfig --levels 235 mysql on
+chkconfig --add httpd
+chkconfig --levels 235 httpd on
 chkconfig --add nginx
 chkconfig --levels 235 nginx on
-chkconfig --add php-fpm
-chkconfig --levels 235 php-fpm on
 chkconfig --add exim
 chkconfig --levels 235 exim on
 chkconfig --add syslog-ng
 chkconfig --levels 235 syslog-ng on
 
-service mysql start
 service exim start
 service syslog-ng start
 
@@ -242,7 +278,6 @@ chown -R nginx:nginx /var/lib/php/session
 
 rm -f /etc/nginx/nginx.conf
     cat > "/etc/nginx/nginx.conf" <<END
-
 user  nginx;
 worker_processes  auto;
 worker_rlimit_nofile 65536;
@@ -253,15 +288,15 @@ pid        /var/run/nginx.pid;
 
 events {
     worker_connections  2048;
-    use epoll;
     multi_accept on;
+    use epoll;
 }
 
 
 http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
-include /etc/nginx/conf/ddos1.conf;
+    include /etc/nginx/conf/ddos1.conf;
     log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
                       '\$status \$body_bytes_sent "\$http_referer" '
                       '"\$http_user_agent" "\$http_x_forwarded_for"';
@@ -293,14 +328,14 @@ include /etc/nginx/conf/ddos1.conf;
     gzip_disable "msie6";
     gzip_vary on;
     gzip_proxied any;
-    gzip_comp_level 3;
+    gzip_comp_level 9;
     gzip_buffers 16 8k;
     gzip_min_length 1024;
     gzip_http_version 1.1;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
 
-  # Cloudflare module cho nginx
+    # Cloudflare module cho nginx
     set_real_ip_from   204.93.240.0/24;
     set_real_ip_from   204.93.177.0/24;
     set_real_ip_from   199.27.128.0/21;
@@ -316,9 +351,48 @@ include /etc/nginx/conf/ddos1.conf;
     set_real_ip_from   198.41.128.0/17;
     real_ip_header     CF-Connecting-IP;
 
+    proxy_cache_path /tmp/cache/home levels=1:2 keys_zone=home:10m inactive=7d max_size=1000m;
+    proxy_cache_path /tmp/cache/mobile levels=1:2 keys_zone=mobile:10m inactive=7d max_size=1000m;
+    server {
+        listen 80;
+        server_name localhost;
+        error_log /var/log/nginx/nginx.error_log;
+
+        location / {
+            proxy_pass http://127.0.0.1:8088;
+            proxy_redirect          off;
+            proxy_set_header        Host            $host;
+            proxy_set_header    X-Real-IP       $remote_addr;
+            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+            client_max_body_size    10m;
+            client_body_buffer_size 128k;
+            proxy_connect_timeout   10;
+            proxy_send_timeout      30;
+            proxy_read_timeout      30;
+            proxy_buffers           32 4k;
+
+            proxy_cache home;
+            proxy_cache_key "$http_user_agent$request_uri";
+            proxy_cache_min_uses 1;
+            proxy_cache_valid 200 302 10m;
+            proxy_cache_valid 404 120m;
+            proxy_cache_use_stale error timeout invalid_header http_500 http_502 http_503 http_504;
+        }
+        location /nginx_status {
+            stub_status on;
+            access_log   off;
+        }
+    }
+    include /etc/nginx/conf/staticfiles.conf;
+    #include /etc/nginx/conf/phpstatus.conf;
+    include /etc/nginx/conf/drop.conf;
+    #include /etc/nginx/conf/errorpage.conf;
     include /etc/nginx/conf.d/*.conf;
 }
 END
+
+rm -rf /etc/nginx/conf.d
+mkdir -p /etc/nginx/conf.d
 
 rm -rf /etc/sysconfig/memcached
 cat > "/etc/sysconfig/memcached" <<END
@@ -329,145 +403,43 @@ CACHESIZE="20"
 OPTIONS=""
 END
 
-rm -rf /etc/nginx/conf.d
-mkdir -p /etc/nginx/conf.d
-    cat > "/etc/nginx/conf.d/$svdomain.conf" <<END
-server {
-	    server_name www.$svdomain;
-	    rewrite ^(.*) http://$svdomain\$1 permanent;
-    	}
-server {
-	    listen   80 default_server;
+cat > "/etc/httpd/vhost/$svdomain.conf" <<END
+<VirtualHost *:8088>
+ServerName $svdomain
+ServerAlias www.$svdomain
+DocumentRoot /home/$svdomain/public_html
+DirectoryIndex index.html index.htm index.php
+<Directory /home/$svdomain/public_html>
+    Options -Indexes FollowSymLinks +ExecCGI
+    AllowOverride AuthConfig FileInfo
+    AddHandler php5-fastcgi .php
+    Action php5-fastcgi /cgi-bin/php.fcgi
+    DirectoryIndex index.php index.html
+    Order allow,deny
+    Allow from all
+</Directory>
+ErrorLog /home/$svdomain/logs/error.log
+CustomLog /home/$svdomain/logs/access_log combined
+</VirtualHost>
 
-    	access_log off;
-    	error_log off;
-    	# error_log /home/$svdomain/logs/error.log;
-    	root /home/$svdomain/public_html;
-include /etc/nginx/conf/ddos2.conf;
-	index index.php index.html index.htm;
-    	server_name $svdomain;   
-
-
-#///////////////////////////////////////////////////////
-#Run all the websites,if you use your rule, comment or delete the line below (AAA)
-include /etc/nginx/conf/all.conf;
-
-#If you use your rule, comment or delete above line, and  Uncoment 3 lines belows and set your rule within it..
-#location / {
-#Uncomment 3 lines and set your rules here!
-#}
-
-#config for wordpress + Plugin super cache, If you run wordpress, uncomment the line below and comment out the line below the AAA
-#include /etc/nginx/conf/supercache.conf;  
-
-#Do not delete the bottom line, if you delete google pagespeed function will not work!!
-#include /etc/nginx/ngx_pagespeed.conf;
-
-#security, sql injection Propeller ....(uncoment if you want to use). Because some website plugins do not run with this config, so xpanel to turn off default
-#include /etc/nginx/conf/block.conf;
- 
-    	location ~ \.php$ {
-		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        	include /etc/nginx/fastcgi_params;
-        	fastcgi_pass 127.0.0.1:9000;
-        	fastcgi_index index.php;
-		fastcgi_connect_timeout 60;
-		fastcgi_send_timeout 180;
-		fastcgi_read_timeout 180;
-		fastcgi_buffer_size 256k;
-		fastcgi_buffers 4 256k;
-		fastcgi_busy_buffers_size 256k;
-		fastcgi_temp_file_write_size 256k;
-		fastcgi_intercept_errors on;
-        	fastcgi_param SCRIPT_FILENAME /home/$svdomain/public_html\$fastcgi_script_name;
-    	}
-	location /nginx_status {
-  		stub_status on;
-  		access_log   off;
-	}
-    	location /php_status {
-            	fastcgi_pass 127.0.0.1:9000;
-            	fastcgi_index index.php;
-            	fastcgi_param SCRIPT_FILENAME  /home/$svdomain/public_html\$fastcgi_script_name;
-            	include /etc/nginx/fastcgi_params;
-    	}
-include /etc/nginx/conf/staticfiles.conf;
-#include /etc/nginx/conf/phpstatus.conf;
-include /etc/nginx/conf/drop.conf;
-#include /etc/nginx/conf/errorpage.conf;
-}
-	
-server {
-	    listen   $svport;
-	 	access_log        off;
-		log_not_found     off;
-	 	error_log         off;
-    	root /home/$svdomain/private_html;
-	    index index.php index.html index.htm;
-    	server_name $svdomain;
- 
-     	location / {
-		try_files \$uri \$uri/ /index.php;
-   	    }
-   	    location /$linuxdash {
-        index index.html index.php;
-        }
-    	location ~ \.php$ {
-		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        	include /etc/nginx/fastcgi_params;
-        	fastcgi_pass 127.0.0.1:9000;
-        	fastcgi_index index.php;
-			fastcgi_connect_timeout 60;
-			fastcgi_send_timeout 180;
-			fastcgi_read_timeout 180;
-			fastcgi_buffer_size 256k;
-			fastcgi_buffers 4 256k;
-			fastcgi_busy_buffers_size 256k;
-			fastcgi_temp_file_write_size 256k;
-			fastcgi_intercept_errors on;
-        	fastcgi_param SCRIPT_FILENAME /home/$svdomain/private_html\$fastcgi_script_name;
-    	}
-        location ~* \.(bak|back|bk)$ {
-		deny all;
-	}
-}
-
+<VirtualHost *:$svport>
+ServerName $svdomain
+ServerAlias www.$svdomain
+DocumentRoot /home/$svdomain/private_html
+DirectoryIndex index.html index.htm index.php
+<Directory /home/$svdomain/private_html>
+    Options -Indexes FollowSymLinks +ExecCGI
+    AllowOverride AuthConfig FileInfo
+    AddHandler php5-fastcgi .php
+    Action php5-fastcgi /cgi-bin/php.fcgi
+    DirectoryIndex index.php index.html
+    Order allow,deny
+    Allow from all
+</Directory>
+ErrorLog /home/$svdomain/logs/error.log
+CustomLog /home/$svdomain/logs/access_log combined
+</VirtualHost>
 END
-
-
-rm -f /etc/php-fpm.d/www.conf
-    cat > "/etc/php-fpm.d/www.conf" <<END
-[www]
-listen = 127.0.0.1:9000
-listen.allowed_clients = 127.0.0.1
-user = nginx
-group = nginx
-pm = ondemand
-pm.max_children = 20
-; default: min_spare_servers + (max_spare_servers - min_spare_servers) / 2
-pm.start_servers = 10
-pm.min_spare_servers = 5
-pm.max_spare_servers = 15
-pm.max_requests = 500
-pm.status_path = /php_status
-request_terminate_timeout = 100s
-pm.process_idle_timeout = 10s;
-request_slowlog_timeout = 4s
-slowlog = /home/$svdomain/logs/php-fpm-slow.log
-rlimit_files = 131072
-rlimit_core = unlimited
-catch_workers_output = yes
-env[HOSTNAME] = \$HOSTNAME
-env[PATH] = /usr/local/bin:/usr/bin:/bin
-env[TMP] = /tmp
-env[TMPDIR] = /tmp
-env[TEMP] = /tmp
-php_admin_value[error_log] = /home/$svdomain/logs/php-fpm-error.log
-php_admin_flag[log_errors] = on
-php_value[session.save_handler] = files
-php_value[session.save_path] = /var/lib/php/session
-END
-
 
 rm -f /etc/php.ini
     cat > "/etc/php.ini" <<END
@@ -492,7 +464,7 @@ max_input_vars = 2000
 realpath_cache_size = 4096k
 realpath_cache_ttl = 360
 error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
-display_errors = Off
+display_errors = On
 display_startup_errors = Off
 log_errors = On
 log_errors_max_len = 1024
@@ -721,17 +693,6 @@ vm.dirty_background_ratio = 10
 
 END
 
-rm -f /etc/php-fpm.conf
-    cat > "/etc/php-fpm.conf" <<END
-include=/etc/php-fpm.d/*.conf
-
-[global]
-pid = /var/run/php-fpm/php-fpm.pid
-error_log = /home/$svdomain/logs/php-fpm.log
-emergency_restart_threshold = 10
-emergency_restart_interval = 1m
-process_control_timeout = 10s
-END
 
 rm -f /etc/my.cnf.d/server.cnf
     cat > "/etc/my.cnf.d/server.cnf" <<END
@@ -836,7 +797,10 @@ printf "========================================================================
 printf "Set Root Password MySQL ... \n"
 printf "=========================================================================\n"
 /bin/mysql_secure_installation
-service mysql restart
+case $mariadb in
+    [yY][eE][sS]|[yY]) service mysql start;;
+    *) service mysqld restart;;
+esac
 
 clear
 printf "=========================================================================\n"
@@ -868,7 +832,7 @@ mkdir -p /var/lib/php/session
 chown -R nginx:nginx /var/lib/php
 clear
 printf "=========================================================================\n"
-printf "Creating \e[32mxPanel\e[0m menu...... \n"
+printf "Creating xPanel menu...... \n"
 printf "=========================================================================\n"
 rm -r -f /etc/motd
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/motd -O /etc/motd
@@ -904,6 +868,15 @@ cd
 find /etc/nginx/conf -type f -exec chmod 644 {} \;
 if [ -f /etc/sysconfig/iptables ]; then
 service iptables start
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
 iptables -I INPUT -p tcp --dport 80 -j ACCEPT
 iptables -I INPUT -p tcp --dport 22 -j ACCEPT
 iptables -I INPUT -p tcp --dport 21 -j ACCEPT
@@ -913,6 +886,8 @@ iptables -I INPUT -p tcp --dport 465 -j ACCEPT
 iptables -I INPUT -p tcp --dport 587 -j ACCEPT
 iptables -I INPUT -p tcp --dport $svport -j ACCEPT
 iptables -I INPUT -p tcp --dport 11211 -j ACCEPT
+iptables -A INPUT -p tcp --dport 8088 -s 127.0.0.1 -j ACCEPT
+iptables -A INPUT -p tcp --dport 8088 -j DROP
 service iptables save
 fi
 chkconfig memcached on
@@ -948,7 +923,7 @@ echo "" >> /etc/xpanel/readme
 echo "If VPS has Opcache enabled, after editing PHP fils, you must clear opcache (restart Php-FPM)" >> /etc/xpanel/readme 
 echo "changes of your code will be updated for your website." >> /etc/xpanel/readme
 echo "" >> /etc/xpanel/readme
-echo "Thank you for using \e[32mxPanel\e[0m." >> /etc/xpanel/readme
+echo "Thank you for using xPanel." >> /etc/xpanel/readme
 # increase SSH login speed
 if [ -f /etc/ssh/sshd_config ]; then 
 sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
@@ -956,7 +931,7 @@ echo "UseDNS no" >> /etc/ssh/sshd_config
 fi
 clear
 printf "=========================================================================\n"
-printf "\e[32mxPanel\e[0m have completed the installation process... \n"
+printf "xPanel have completed the installation process... \n"
 printf "=========================================================================\n"
 printf "Manage info saved in: /etc/xpanel/readme \n"
 printf "=========================================================================\n"

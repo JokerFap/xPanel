@@ -7,7 +7,7 @@ fi
 prompt="Type in your choice:"
 options=("Add Website" "Remove website" "Backup code & Config" "Check & Block IP DOS" "Database Manage" "PhpMyadmin Manage" "Zend OPcache Manage" "Google pagespeed Manage" "Memcached Manage" "Swap Manage" "Cronjob Manage" "CSF Firewall Manage" "IPtables Firewall Manage" "Setup SSL (https)" "Download Log file" "Tools - Addons" "Upgrade / Downgrade PHP" "Server Status" "Update xPanel" "Exit")
 printf "=========================================================================\n"
-printf "               \e[32mxPanel\e[0m - Manage VPS/Server by JokerFap                \n"
+printf "               xPanel - Manage VPS/Server by JokerFap                \n"
 printf "=========================================================================\n"
 printf "                             xPanel Menu                                \n"
 printf "=========================================================================\n"

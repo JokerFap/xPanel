@@ -1,15 +1,15 @@
 #!/bin/sh
-. /home/vpssim.conf
+. /etc/xpanel/xpanel.conf
 if [ $(id -u) != "0" ]; then
-    printf "Error ! VPSSIM run only with root user !\n"
+    printf "Error ! xPanel run only with root user !\n"
     exit
 fi
 prompt="Type in your choice:"
-options=("Add Website & Code" "Remove website" "Backup code & Config" "Check & Block IP DOS" "Database Manage" "PhpMyadmin Manage" "Zend OPcache Manage" "Google pagespeed Manage" "Memcached Manage" "Swap Manage" "Cronjob Manage" "CSF Firewall Manage" "IPtables Firewall Manage" "Setup SSL (https)" "Download Log file" "Tools - Addons" "Upgrade / Downgrade PHP" "Server Status" "Update VPSSIM" "Exit")
+options=("Add Website" "Remove website" "Backup code & Config" "Check & Block IP DOS" "Database Manage" "PhpMyadmin Manage" "Zend OPcache Manage" "Google pagespeed Manage" "Memcached Manage" "Swap Manage" "Cronjob Manage" "CSF Firewall Manage" "IPtables Firewall Manage" "Setup SSL (https)" "Download Log file" "Tools - Addons" "Upgrade / Downgrade PHP" "Server Status" "Update xPanel" "Exit")
 printf "=========================================================================\n"
-printf "               VPSSIM - Manage VPS/Server by VPSSIM.COM                \n"
+printf "               \e[32mxPanel\e[0m - Manage VPS/Server by JokerFap                \n"
 printf "=========================================================================\n"
-printf "                             VPSSIM Menu                                \n"
+printf "                             xPanel Menu                                \n"
 printf "=========================================================================\n"
 
 PS3="$prompt"
@@ -17,26 +17,26 @@ select opt in "${options[@]}" ; do
 
     case "$REPLY" in
 
-    1) clear && /etc/vpssim/menu/vpssim-befor-them-website-menu;;
-    2) /etc/vpssim/menu/vpssim-befor-xoa-website;;
-    3) clear && /etc/vpssim/menu/vpssim-sao-luu;;
-    4) clear && /etc/vpssim/menu/vpssim-kiem-tra-ddos;;
-    5) clear && /etc/vpssim/menu/vpssim-befor-them-xoa-database;;
-    6) clear && /etc/vpssim/menu/vpssim-phpmyadmin-menu;;
-    7) clear && /etc/vpssim/menu/opcache/vpssim-before-opcache;;
-    8) clear && /etc/vpssim/menu/pagespeed/vpssim-pagespeed-menu;;
-    9) clear && /etc/vpssim/menu/memcache/vpssim-before-memcache-menu;;
-    10) clear && /etc/vpssim/menu/swap/vpssim-them-swap-menu;;
-    11) clear && /etc/vpssim/menu/crontab/vpssim-cronjob-menu;;
-    12) /etc/vpssim/menu/CSF-Fiwall/vpssim-csf-firewall-before-menu;;
-    13) clear && /etc/vpssim/menu/vpssim-iptables-firewall-manager-menu;;
-    14) clear && /etc/vpssim/menu/vpssim-tao-ssl-menu;;
-    15) clear && /etc/vpssim/menu/vpssim-eroor-menu;;
-    16) clear && /etc/vpssim/menu/vpssim-tien-ich;;
-    17) clear && /etc/vpssim/menu/nangcap-php/vpssim-updown-php;;
-    18) clear && /etc/vpssim/menu/vpssim-vps-info;;
-    19) /etc/vpssim/menu/vpssim-nang-cap-scripts;;
-    20) clear && echo "Thank you for Using VPSSIM. Bye !" && killall -g vpssim && clear;;  
+    1) clear && /etc/xpanel/menu/website/add-website;;
+    2) /etc/xpanel/menu/befor-remove-website;;
+    3) clear && /etc/xpanel/menu/backup;;
+    4) clear && /etc/xpanel/menu/check-ddos;;
+    5) clear && /etc/xpanel/menu/vpssim-befor-them-xoa-database;;
+    6) clear && /etc/xpanel/menu/phpmyadmin-menu;;
+    7) clear && /etc/xpanel/menu/opcache/vpssim-before-opcache;;
+    8) clear && /etc/xpanel/menu/pagespeed/pagespeed-menu;;
+    9) clear && /etc/xpanel/menu/memcache/vpssim-before-memcache-menu;;
+    10) clear && /etc/xpanel/menu/swap/vpssim-them-swap-menu;;
+    11) clear && /etc/xpanel/menu/crontab/vpssim-cronjob-menu;;
+    12) /etc/xpanel/menu/CSF-Fiwall/vpssim-csf-firewall-before-menu;;
+    13) clear && /etc/xpanel/menu/vpssim-iptables-firewall-manager-menu;;
+    14) clear && /etc/xpanel/menu/vpssim-tao-ssl-menu;;
+    15) clear && /etc/xpanel/menu/vpssim-eroor-menu;;
+    16) clear && /etc/xpanel/menu/vpssim-tien-ich;;
+    17) clear && /etc/xpanel/menu/upgrade-php/vpssim-updown-php;;
+    18) clear && /etc/xpanel/menu/vps-info;;
+    19) /etc/xpanel/menu/vpssim-nang-cap-scripts;;
+    20) clear && echo "Thank you for Using xPanel. Bye !" && killall -g vpssim && clear;;  
     *) echo "You typed wrong, please type in the ordinal number on the list";continue;;
 
     esac

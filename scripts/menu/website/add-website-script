@@ -1,6 +1,6 @@
 #!/bin/bash 
+. /etc/xpanel/xpanel.conf
 
-. /home/vpssim.conf
 echo "========================================================================="
 echo -n "Type in domain you want to add to server [ENTER]: " 
 read website
@@ -8,7 +8,7 @@ if [ "$website" = "" ]; then
 clear
 echo "========================================================================="
 echo "You typed wrong, please type in accurately!"
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi
 
@@ -20,7 +20,7 @@ echo "========================================================================="
 echo "$website maybe not a domain name!"
 echo "-------------------------------------------------------------------------"
 echo "Please try again !"
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi
 
@@ -29,11 +29,11 @@ if [ -f /etc/nginx/conf.d/$website.conf ]; then
 clear
 echo "========================================================================="
 echo "Discover that $website is existed in the system!"
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi
     mkdir -p "/home/$website/public_html"
-    \cp -uf /etc/vpssim/menu/robots.txt "/home/$website/public_html/"
+    \cp -uf /etc/xpanel/menu/robots.txt "/home/$website/public_html/"
 chown -R nginx:nginx "/home/$website/public_html/"
 find "/home/$website/public_html/" -type d -exec chmod g+s {} \;
     mkdir -p "/home/$website/logs"
@@ -168,27 +168,19 @@ END
 	mysql -u root -p$mariadbpass < /tmp/config.temp
 	rm -f /tmp/config.temp
 
-echo "=========================================================================" >> /home/DBinfo.txt
-echo "Database: $dataname - Created on: $(date +%d/%m/%Y) when add $website to VPS" >> /home/DBinfo.txt
-echo "=========================================================================" >> /home/DBinfo.txt
-echo "Data name: $dataname" >> /home/DBinfo.txt
-echo "Username: $username" >> /home/DBinfo.txt
-echo "password: $password" >> /home/DBinfo.txt
-echo "" >> /home/DBinfo.txt
-
 clear
 echo "========================================================================="
 echo "$website is added successful to server"
 echo "-------------------------------------------------------------------------"
 echo "Upload code to /home/$website/public_html"
 echo "-------------------------------------------------------------------------"
-echo "Database auto created by VPSSIM for $website :"
+echo "Database auto created by xPanel for $website :"
 echo "-------------------------------------------------------------------------"
 echo "Database: $dataname"
 echo "User name: $username" 
 echo "Password: $password"
 echo "-------------------------------------------------------------------------"
-echo "Database's infomation saved in: /home/DBinfo.txt"
-/etc/vpssim/menu/vpssim-them-website-menu
+
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi

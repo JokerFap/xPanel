@@ -58,7 +58,7 @@ clear
 prompt="Type in your choice:"
 options=( "PHP 5.6" "PHP 5.5" "PHP 5.4" "Exit" )
 echo "========================================================================="
-echo "                xPanel - Manage VPS/Server by JokerFap               "
+echo "                \e[32mxPanel\e[0m - Manage VPS/Server by JokerFap               "
 echo "========================================================================="
 echo "                          xPanel Setup Menu                                 "
 echo "========================================================================="

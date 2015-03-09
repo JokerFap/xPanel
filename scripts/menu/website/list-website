@@ -1,5 +1,5 @@
 #!/bin/bash
-. /home/vpssim.conf
+. /etc/xpanel/xpanel.conf
 if [ ! -d "/home/$mainsite/private_html/listwebsite" ]; then
 mkdir -p /home/$mainsite/private_html/listwebsite
 else
@@ -18,7 +18,7 @@ if [ "$listwebsite" = "" ]; then
 clear
 echo "========================================================================="
 echo "You typed wrong, Please fill accurately. "
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi
 
@@ -28,7 +28,7 @@ echo "========================================================================="
 echo "The security code make your list files more security."
 echo "-------------------------------------------------------------------------"
 echo "It must be at least 5 characters long. Please try again !"
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi  
 echo "-------------------------------------------------------------------------"
@@ -51,7 +51,7 @@ echo "-------------------------------------------------------------------------"
 echo "http://$serverip:$priport/listwebsite/$listwebsite-listsite.txt"
 echo "-------------------------------------------------------------------------"
 echo "http://$mainsite:$priport/listwebsite/$listwebsite-listsite.txt"
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
         ;;
     *)
         echo ""
@@ -61,6 +61,6 @@ clear
 clear
 echo "========================================================================="
 echo "Cancel CREATE list website."
-/etc/vpssim/menu/vpssim-them-website-menu
+/etc/xpanel/menu/website/add-website-menu
 exit
 fi

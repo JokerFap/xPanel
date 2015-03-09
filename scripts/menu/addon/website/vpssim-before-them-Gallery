@@ -1,5 +1,0 @@
-#!/bin/bash
-. /home/vpssim.conf
-wget -q http://vpssim.com/script/vpssim/linkcode.conf -O /etc/vpssim/linkcode.conf
-clear
-/etc/vpssim/menu/addon/website/vpssim-them-Gallery

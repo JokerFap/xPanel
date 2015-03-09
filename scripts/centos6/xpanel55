@@ -57,7 +57,7 @@ read svport
 if [ "$svport" = "80" ] || [ "$svport" = "443" ] || [ "$svport" = "22" ] || [ "$svport" = "3306" ] || [ "$svport" = "25" ] || [ "$svport" = "465" ] || [ "$svport" = "587" ] || [ "$svport" = "21" ]; then
 	svport="2313"
 echo "PhpMyAdmin port can not be coincide with the other port service"
-echo "vpssim will set PMA port is 2313"
+echo "xpanel will set PMA port is 2313"
 fi
 if [ "$svport" = "" ] ; then
 clear
@@ -103,15 +103,15 @@ echo "Link view Zend Opcache status: http://$svip:$svport/ocp.php"
 echo "-------------------------------------------------------------------------"
 echo "Link view Memcache status: http://$svip:$svport/memcache.php"
 echo "========================================================================="
-echo "If you pointed sim.$svdomain to $svip"
+echo "If you pointed $svdomain to $svip"
 echo "-------------------------------------------------------------------------"
-echo "Link Phpmyadmin (II): http://sim.$svdomain:$svport"
+echo "Link Phpmyadmin (II): http://$svdomain:$svport"
 echo "-------------------------------------------------------------------------"
-echo "Link view VPS status (II): http://sim.$svdomain:$svport/$linuxdash"
+echo "Link view VPS status (II): http://$svdomain:$svport/$linuxdash"
 echo "========================================================================="
-echo "Command to call VPSSIM menu: vpssim"
+echo "Command to call xPanel menu: xpanel"
 echo "-------------------------------------------------------------------------"
-echo "Only sim.$svdomain added to VPS, so you have to go to VPSSIM menu"
+echo "Only $svdomain added to VPS, so you have to go to xPanel menu"
 echo "-------------------------------------------------------------------------"
 echo "Use [Add website & Code] functions to add $svdomain to VPS ! "
 echo "========================================================================="
@@ -154,39 +154,39 @@ yum -y remove postfix*
 yum -y remove rsyslog*
 
 yum -y update
-mkdir -p /usr/local/vpssim
-cd /usr/local/vpssim
+mkdir -p /usr/local/xpanel
+cd /usr/local/xpanel
 groupadd nginx
 useradd -g nginx -d /dev/null -s /sbin/nologin nginx
 sudo yum -y install gcc gcc-c++ pcre-dev pcre-devel zlib-devel expect imake lsof autoconf nc libedit-devel make automake perl-libwww-perl tree virt-what cmake openssl-devel libxml2-devel libtool bind-utils libXext-devel cyrus-sasl-devel glib2 glib2-devel openssl bzip2 bzip2-devel flex bison libcurl-devel which libevent libevent-devel libxslt-devel gd gd-devel perl-ExtUtils-Embed patch sysstat libgcj gettext-devel vim-minimal nano cairo-devel libxml2-devel libpng-devel freetype freetype-devel libart_lgpl-devel  GeoIP-devel gperftools-devel libicu libicu-devel aspell aspell-devel libtidy libtidy-devel readline-devel iptables* libedit-devel enchant enchant-devel pam-devel git perl-ExtUtils-MakeMaker perl-Time-HiRes openldap-devel curl curl-devel diffutils libc-client libc-client-devel numactl lsof pkgconfig gdbm-devel tk-devel bluez-libs-devel
 sudo yum -y install unzip zip rar unrar rsync psmisc
 cd
-cd /usr/local/vpssim
+cd /usr/local/xpanel
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx/Nginx-accesskey-2.0.3.tar.gz
 tar -xzf Nginx-accesskey-2.0.3.tar.gz
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx//ngx_cache_purge-2.3.tar.gz
 tar -xzf ngx_cache_purge-2.3.tar.gz
 cd
-cd /usr/local/vpssim
-#cai dat pagespeed
+cd /usr/local/xpanel
+#Install pagespeed
 wget -q http://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip
 unzip release-${NPS_VERSION}-beta.zip
 cd ngx_pagespeed-release-${NPS_VERSION}-beta/
 wget -q http://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz
 tar -xzvf ${NPS_VERSION}.tar.gz  # extracts to psol/
 cd
-cd /usr/local/vpssim
-#cai dat nginx
+cd /usr/local/xpanel
+#Install nginx
 wget -q http://nginx.org/download/nginx-${Nginx_VERSION}.tar.gz
 tar -xzf nginx-${Nginx_VERSION}.tar.gz
-cd /usr/local/vpssim/nginx-${Nginx_VERSION}
-sed -i 's/"Server: nginx"/"Server: Nginx-VPSSIM"/g' /usr/local/vpssim/nginx-${Nginx_VERSION}/src/http/ngx_http_header_filter_module.c
-sed -i 's/"Server: "/"Server: Nginx-VPSSIM"/g' /usr/local/vpssim/nginx-${Nginx_VERSION}/src/http/ngx_http_header_filter_module.c
-./configure --prefix=/usr/share/nginx --sbin-path=/usr/sbin/nginx --group=nginx --user=nginx --pid-path=/var/run/nginx.pid --with-http_spdy_module --with-http_ssl_module --with-ipv6 --with-http_flv_module --with-http_mp4_module --with-http_random_index_module --with-http_secure_link_module --with-http_stub_status_module --with-http_sub_module --with-http_xslt_module --with-http_addition_module --with-http_dav_module --with-http_geoip_module --with-http_image_filter_module --with-http_perl_module --with-mail --add-module=/usr/local/vpssim/ngx_cache_purge-2.3 --add-module=/usr/local/vpssim/nginx-accesskey-2.0.3 --with-mail_ssl_module --with-http_gunzip_module --with-file-aio --with-pcre --with-google_perftools_module --with-debug --with-openssl-opt="enable-tlsext" --conf-path=/etc/nginx/nginx.conf --with-http_gzip_static_module --with-http_realip_module --with-http_stub_status_module --add-module=/usr/local/vpssim/ngx_pagespeed-release-${NPS_VERSION}-beta
+cd /usr/local/xpanel/nginx-${Nginx_VERSION}
+sed -i 's/"Server: nginx"/"Server: xPanel"/g' /usr/local/xpanel/nginx-${Nginx_VERSION}/src/http/ngx_http_header_filter_module.c
+sed -i 's/"Server: "/"Server: xPanel"/g' /usr/local/xpanel/nginx-${Nginx_VERSION}/src/http/ngx_http_header_filter_module.c
+./configure --prefix=/usr/share/nginx --sbin-path=/usr/sbin/nginx --group=nginx --user=nginx --pid-path=/var/run/nginx.pid --with-http_spdy_module --with-http_ssl_module --with-ipv6 --with-http_flv_module --with-http_mp4_module --with-http_random_index_module --with-http_secure_link_module --with-http_stub_status_module --with-http_sub_module --with-http_xslt_module --with-http_addition_module --with-http_dav_module --with-http_geoip_module --with-http_image_filter_module --with-http_perl_module --with-mail --add-module=/usr/local/xpanel/ngx_cache_purge-2.3 --add-module=/usr/local/xpanel/nginx-accesskey-2.0.3 --with-mail_ssl_module --with-http_gunzip_module --with-file-aio --with-pcre --with-google_perftools_module --with-debug --with-openssl-opt="enable-tlsext" --conf-path=/etc/nginx/nginx.conf --with-http_gzip_static_module --with-http_realip_module --with-http_stub_status_module --add-module=/usr/local/xpanel/ngx_pagespeed-release-${NPS_VERSION}-beta
 make
 make install
 rm -f /etc/init.d/nginx
-wget -q http://vpssim.com/script/vpssim/nginx -O /etc/init.d/nginx && chmod +x /etc/init.d/nginx
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/nginx/nginx -O /etc/init.d/nginx && chmod +x /etc/init.d/nginx
 yum -y install MariaDB-server MariaDB-client exim syslog-ng cronie
 yum -y --enablerepo=remi,remi-php55 install php php-curl php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-fpm php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
 yum -y install memcached
@@ -223,16 +223,16 @@ service mysql start
 service exim start
 service syslog-ng start
 
-mkdir -p /home/sim.$svdomain/public_html
-cd /home/sim.$svdomain/public_html
-#wget http://hostingaz.vn/script/vpssim/robots.txt
+mkdir -p /home/$svdomain/public_html
+cd /home/$svdomain/public_html
+
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/html/index.html
 cd
-mkdir -p /home/sim.$svdomain/private_html
+mkdir -p /home/$svdomain/private_html
 
 
-mkdir -p /home/sim.$svdomain/logs
-chmod 777 /home/sim.$svdomain/logs
+mkdir -p /home/$svdomain/logs
+chmod 777 /home/$svdomain/logs
 
 mkdir -p /var/cache/ngx_pagespeed
 mkdir -p /var/log/nginx
@@ -331,21 +331,21 @@ END
 
 rm -rf /etc/nginx/conf.d
 mkdir -p /etc/nginx/conf.d
-    cat > "/etc/nginx/conf.d/sim.$svdomain.conf" <<END
+    cat > "/etc/nginx/conf.d/$svdomain.conf" <<END
 server {
-	    server_name www.sim.$svdomain;
-	    rewrite ^(.*) http://sim.$svdomain\$1 permanent;
+	    server_name www.$svdomain;
+	    rewrite ^(.*) http://$svdomain\$1 permanent;
     	}
 server {
 	    listen   80 default_server;
 
     	access_log off;
     	error_log off;
-    	# error_log /home/sim.$svdomain/logs/error.log;
-    	root /home/sim.$svdomain/public_html;
+    	# error_log /home/$svdomain/logs/error.log;
+    	root /home/$svdomain/public_html;
 include /etc/nginx/conf/ddos2.conf;
 	index index.php index.html index.htm;
-    	server_name sim.$svdomain;   
+    	server_name $svdomain;   
 
 
 #///////////////////////////////////////////////////////
@@ -363,7 +363,7 @@ include /etc/nginx/conf/all.conf;
 #Do not delete the bottom line, if you delete google pagespeed function will not work!!
 #include /etc/nginx/ngx_pagespeed.conf;
 
-#security, sql injection Propeller ....(uncoment if you want to use). Because some website plugins do not run with this config, so vpssim to turn off default
+#security, sql injection Propeller ....(uncoment if you want to use). Because some website plugins do not run with this config, so xpanel to turn off default
 #include /etc/nginx/conf/block.conf;
  
     	location ~ \.php$ {
@@ -379,7 +379,7 @@ include /etc/nginx/conf/all.conf;
 		fastcgi_busy_buffers_size 256k;
 		fastcgi_temp_file_write_size 256k;
 		fastcgi_intercept_errors on;
-        	fastcgi_param SCRIPT_FILENAME /home/sim.$svdomain/public_html\$fastcgi_script_name;
+        	fastcgi_param SCRIPT_FILENAME /home/$svdomain/public_html\$fastcgi_script_name;
     	}
 	location /nginx_status {
   		stub_status on;
@@ -388,7 +388,7 @@ include /etc/nginx/conf/all.conf;
     	location /php_status {
             	fastcgi_pass 127.0.0.1:9000;
             	fastcgi_index index.php;
-            	fastcgi_param SCRIPT_FILENAME  /home/sim.$svdomain/public_html\$fastcgi_script_name;
+            	fastcgi_param SCRIPT_FILENAME  /home/$svdomain/public_html\$fastcgi_script_name;
             	include /etc/nginx/fastcgi_params;
     	}
 include /etc/nginx/conf/staticfiles.conf;
@@ -402,9 +402,9 @@ server {
 	 	access_log        off;
 		log_not_found     off;
 	 	error_log         off;
-    	root /home/sim.$svdomain/private_html;
+    	root /home/$svdomain/private_html;
 	    index index.php index.html index.htm;
-    	server_name sim.$svdomain;
+    	server_name $svdomain;
  
      	location / {
 		try_files \$uri \$uri/ /index.php;
@@ -425,7 +425,7 @@ server {
 			fastcgi_busy_buffers_size 256k;
 			fastcgi_temp_file_write_size 256k;
 			fastcgi_intercept_errors on;
-        	fastcgi_param SCRIPT_FILENAME /home/sim.$svdomain/private_html\$fastcgi_script_name;
+        	fastcgi_param SCRIPT_FILENAME /home/$svdomain/private_html\$fastcgi_script_name;
     	}
         location ~* \.(bak|back|bk)$ {
 		deny all;
@@ -453,7 +453,7 @@ pm.status_path = /php_status
 request_terminate_timeout = 100s
 pm.process_idle_timeout = 10s;
 request_slowlog_timeout = 4s
-slowlog = /home/sim.$svdomain/logs/php-fpm-slow.log
+slowlog = /home/$svdomain/logs/php-fpm-slow.log
 rlimit_files = 131072
 rlimit_core = unlimited
 catch_workers_output = yes
@@ -462,7 +462,7 @@ env[PATH] = /usr/local/bin:/usr/bin:/bin
 env[TMP] = /tmp
 env[TMPDIR] = /tmp
 env[TEMP] = /tmp
-php_admin_value[error_log] = /home/sim.$svdomain/logs/php-fpm-error.log
+php_admin_value[error_log] = /home/$svdomain/logs/php-fpm-error.log
 php_admin_flag[log_errors] = on
 php_value[session.save_handler] = files
 php_value[session.save_path] = /var/lib/php/session
@@ -727,7 +727,7 @@ include=/etc/php-fpm.d/*.conf
 
 [global]
 pid = /var/run/php-fpm/php-fpm.pid
-error_log = /home/sim.$svdomain/logs/php-fpm.log
+error_log = /home/$svdomain/logs/php-fpm.log
 emergency_restart_threshold = 10
 emergency_restart_interval = 1m
 process_control_timeout = 10s
@@ -775,10 +775,10 @@ table_open_cache = 1024
 
 
 
-log_error = /home/sim.$svdomain/logs/mysql.log
+log_error = /home/$svdomain/logs/mysql.log
 log_queries_not_using_indexes = 0
 slow_query_log = 1
-slow_query_log_file = /home/sim.$svdomain/logs/mysql-slow.log
+slow_query_log_file = /home/$svdomain/logs/mysql-slow.log
 
 [embedded]
 
@@ -801,25 +801,25 @@ END
 ulimit  -n 65536
 
 
-mkdir -p /etc/vpssim
+mkdir -p /etc/xpanel
 
-rm -r -f /etc/vpssim/opcache.conf
-cat > "/etc/vpssim/opcache.conf" <<END
+rm -r -f /etc/xpanel/opcache.conf
+cat > "/etc/xpanel/opcache.conf" <<END
 opcachesize="40"
 opcachephpmax="3000"
 END
 
-rm -f /home/vpssim.conf
-    cat > "/home/vpssim.conf" <<END
-mainsite="sim.$svdomain"
+rm -f /etc/xpanel/xpanel.conf
+    cat > "/etc/xpanel/xpanel.conf" <<END
+mainsite="sv.$svdomain"
 priport="$svport"
 serverip="$svip"
 END
-rm -r -f /etc/vpssim/nginx.version
-cat > "/etc/vpssim/nginx.version" <<END
+rm -r -f /etc/xpanel/nginx.version
+cat > "/etc/xpanel/nginx.version" <<END
 ${Nginx_VERSION}
 END
-cat > "/etc/vpssim/phpmyadmin.version" <<END
+cat > "/etc/xpanel/phpmyadmin.version" <<END
 ${phpmyadmin_version}
 END
 
@@ -843,9 +843,9 @@ printf "========================================================================
 printf "Install Phpmyadmin... \n"
 printf "=========================================================================\n"
 sleep 2
-cd /home/sim.$svdomain/private_html/
+cd /home/$svdomain/private_html/
 wget -q https://gist.github.com/ck-on/4959032/raw/0b871b345fd6cfcd6d2be030c1f33d1ad6a475cb/ocp.php
-wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/memcache.php -O /home/sim.$svdomain/private_html/memcache.php
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/memcache.php -O /home/$svdomain/private_html/memcache.php
 wget -q http://jaist.dl.sourceforge.net/project/phpmyadmin/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.zip
 unzip -q phpMyAdmin-*.zip
 yes | cp -rf phpMyAdmin-*/* .
@@ -856,8 +856,8 @@ printf "========================================================================
 printf "Install Linux Dash ...... \n"
 printf "=========================================================================\n"
 sleep 2
-mkdir -p /home/sim.$svdomain/private_html/$linuxdash
-cd /home/sim.$svdomain/private_html/$linuxdash
+mkdir -p /home/$svdomain/private_html/$linuxdash
+cd /home/$svdomain/private_html/$linuxdash
 wget -q https://github.com/afaqurk/linux-dash/archive/master.zip
 unzip -q master.zip
 yes | cp -rf linux-dash-master/* .
@@ -868,35 +868,36 @@ mkdir -p /var/lib/php/session
 chown -R nginx:nginx /var/lib/php
 clear
 printf "=========================================================================\n"
-printf "Creating VPSSIM menu...... \n"
+printf "Creating \e[32mxPanel\e[0m menu...... \n"
 printf "=========================================================================\n"
 rm -r -f /etc/motd
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/motd -O /etc/motd
 wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/conf/ngx_pagespeed.conf -O /etc/nginx/ngx_pagespeed.conf
-wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/xpanel -O /bin/vpssim && chmod +x /bin/xpanel
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/xpanel -O /bin/xpanel && chmod +x /bin/xpanel
 
-wget -q http://vpssim.com/script/vpssim/vpssim.version -O /etc/vpssim/vpssim.version && chmod +x /etc/vpssim/vpssim.version
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/xpanel.version -O /etc/xpanel/xpanel.version && chmod +x /etc/xpanel/xpanel.version
 
-cd /etc/vpssim/
-wget -q http://vpssim.com/script/vpssim/menu.zip
+cd /etc/xpanel/
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/menu.zip
 unzip -q menu.zip
 rm -r -f menu.zip
 cd
-find /etc/vpssim/menu -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/addon/website -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/checkddos -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/crontab -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/CSF-Fiwall -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/downloadlog -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/memcache -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/nangcap-php -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/opcache -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/pagespeed -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/swap -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/tienich -type f -exec chmod 755 {} \;
-find /etc/vpssim/menu/wordpress-multi -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/addon/website -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/checkddos -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/crontab -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/CSF-Fiwall -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/downloadlog -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/memcache -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/upgrade-php -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/opcache -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/pagespeed -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/swap -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/tienich -type f -exec chmod 755 {} \;
+find /etc/xpanel/menu/wordpress-multi -type f -exec chmod 755 {} \;
 cd /etc/nginx/
-wget -q http://vpssim.com/script/vpssim/conf.zip
+conf
+wget -q https://raw.githubusercontent.com/JokerFap/xPanel/Panel/scripts/conf/conf.zip
 unzip -q conf.zip
 rm -rf conf.zip
 cd
@@ -916,37 +917,38 @@ service iptables save
 fi
 chkconfig memcached on
 service memcached start
+rm -r -f /usr/local/xpanel
 rm -r -f /root/install
 rm -r -f /root/xpanel55
-rm -r -f /root/vpssim54
-rm -r -f /root/vpssim56
-echo "=========================================================================" > /home/VPSSIM-Setup-info.txt
-echo "                           VPS MANAGE INFOMATION "                         >>/home/VPSSIM-Setup-info.txt
-echo "=========================================================================" >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Command to call VPSSIM menu: vpssim" >> /home/VPSSIM-Setup-info.txt
-echo "Manage Domain: http://sim.$svdomain" >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Link PhpMyAdmin (I): http://$svip:$svport" >> /home/VPSSIM-Setup-info.txt
-echo "Link PhpMyAdmin (II): http://sim.$svdomain:$svport" >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Link view Zend Opcache status (I): http://$svip:$svport/ocp.php" >> /home/VPSSIM-Setup-info.txt
-echo "Link view Zend Opcache status (II): http://sim.$svdomain:$svport/ocp.php" >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Link view Memcache status (I): http://$svip:$svport/memcache.php" >> /home/VPSSIM-Setup-info.txt
-echo "Link view Memcache status (II): http://sim.$svdomain:$svport/memcache.php" >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Link view VPS status (I): http://$svip:$svport/$linuxdash " >> /home/VPSSIM-Setup-info.txt
-echo "Link view VPS status (II): http://sim.$svdomain:$svport/$linuxdash " >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Note:" >> /home/VPSSIM-Setup-info.txt
-echo "To have the best performance for VPS , you should enable : Zend Opcache, Memcached,: Zend Opcache, Memcached, " >> /home/VPSSIM-Setup-info.txt
-echo "Google pagespeed and use plugin Plugin cache(wp super cache....) for your website." >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "If VPS has Opcache enabled, after editing PHP fils, you must clear opcache (restart Php-FPM)" >> /home/VPSSIM-Setup-info.txt 
-echo "changes of your code will be updated for your website." >> /home/VPSSIM-Setup-info.txt
-echo "" >> /home/VPSSIM-Setup-info.txt
-echo "Thank you for using VPSSIM." >> /home/VPSSIM-Setup-info.txt
+rm -r -f /root/xpanel54
+rm -r -f /root/xpanel56
+echo "=========================================================================" > /etc/xpanel/readme
+echo "                           VPS MANAGE INFOMATION "                         >>/etc/xpanel/readme
+echo "=========================================================================" >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Command to call xPanel menu: xpanel" >> /etc/xpanel/readme
+echo "Manage Domain: http://$svdomain" >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Link PhpMyAdmin (I): http://$svip:$svport" >> /etc/xpanel/readme
+echo "Link PhpMyAdmin (II): http://$svdomain:$svport" >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Link view Zend Opcache status (I): http://$svip:$svport/ocp.php" >> /etc/xpanel/readme
+echo "Link view Zend Opcache status (II): http://$svdomain:$svport/ocp.php" >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Link view Memcache status (I): http://$svip:$svport/memcache.php" >> /etc/xpanel/readme
+echo "Link view Memcache status (II): http://$svdomain:$svport/memcache.php" >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Link view VPS status (I): http://$svip:$svport/$linuxdash " >> /etc/xpanel/readme
+echo "Link view VPS status (II): http://$svdomain:$svport/$linuxdash " >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Note:" >> /etc/xpanel/readme
+echo "To have the best performance for VPS , you should enable : Zend Opcache, Memcached,: Zend Opcache, Memcached, " >> /etc/xpanel/readme
+echo "Google pagespeed and use plugin Plugin cache(wp super cache....) for your website." >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "If VPS has Opcache enabled, after editing PHP fils, you must clear opcache (restart Php-FPM)" >> /etc/xpanel/readme 
+echo "changes of your code will be updated for your website." >> /etc/xpanel/readme
+echo "" >> /etc/xpanel/readme
+echo "Thank you for using \e[32mxPanel\e[0m." >> /etc/xpanel/readme
 # increase SSH login speed
 if [ -f /etc/ssh/sshd_config ]; then 
 sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
@@ -954,9 +956,9 @@ echo "UseDNS no" >> /etc/ssh/sshd_config
 fi
 clear
 printf "=========================================================================\n"
-printf "VPSSIM have completed the installation process... \n"
+printf "\e[32mxPanel\e[0m have completed the installation process... \n"
 printf "=========================================================================\n"
-printf "Manage info saved in: /home/VPSSIM-Setup-info.txt \n"
+printf "Manage info saved in: /etc/xpanel/readme \n"
 printf "=========================================================================\n"
 printf "VPS reboot is complete, access $svip to check in your browser! \n"
 printf "=========================================================================\n"

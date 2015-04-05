@@ -91,10 +91,7 @@ echo -n "Type In Your Domain [ENTER]: "
 read svdomain
 if [ "$svdomain" = "" ]; then
 clear
-    
    echo -e "******************** YOUR DOMAIN CAN NOT BE VACATED ! ********************"
-
-   
 ./install
 exit
 fi
@@ -135,16 +132,7 @@ echo "Please try again !"
 ./install
 exit
 fi
-
-prompt="Type in your choice(4-Exit):"
-options=( "PHP 5.4" "PHP 5.5 " "PHP 5.6" "Exit")
-printf "=========================================================================\n"
-printf "               xPanel - Manage VPS/Server by JokerFap \n"
-printf "=========================================================================\n"
-printf "                        Select PHP Version\n"
-printf "=========================================================================\n"
-
-php="5.5"
+php="5.5";;
 
 clear
 echo "Information You Have Filled:"

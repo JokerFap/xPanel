@@ -91,14 +91,17 @@ echo -n "Type In Your Domain [ENTER]: "
 read svdomain
 if [ "$svdomain" = "" ]; then
 clear
+    
    echo -e "******************** YOUR DOMAIN CAN NOT BE VACATED ! ********************"
+
+   
 ./install
 exit
 fi
 
 kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
 if [[ ! "$svdomain" =~ $kiemtradomain3 ]]; then
-	svdomain=`echo $svdomain | tr '[A-Z]' '[a-z]'`
+    svdomain=`echo $svdomain | tr '[A-Z]' '[a-z]'`
 clear
 echo "========================================================================="
 echo "$svdomain maybe not a domain name!"
@@ -110,7 +113,7 @@ fi
 echo -n "Type In Phpmyadmin Port [ENTER]: " 
 read svport
 if [ "$svport" = "80" ] || [ "$svport" = "443" ] || [ "$svport" = "22" ] || [ "$svport" = "3306" ] || [ "$svport" = "25" ] || [ "$svport" = "465" ] || [ "$svport" = "587" ] || [ "$svport" = "21" ]; then
-	svport="2022"
+    svport="2022"
 echo "PhpMyAdmin port can not be coincide with the other port service"
 echo "xpanel will set PMA port is 2022"
 fi
@@ -132,9 +135,38 @@ echo "Please try again !"
 ./install
 exit
 fi
-php="5.5"
+
+prompt="Type in your choice(4-Exit):"
+options=( "PHP 5.4" "PHP 5.5 " "PHP 5.6" "Exit")
+printf "=========================================================================\n"
+printf "               xPanel - Manage VPS/Server by JokerFap \n"
+printf "=========================================================================\n"
+printf "                        Select PHP Version\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+    case "$REPLY" in
+    1) php="5.4";;
+    2) php="5.5";;
+    3) php="5.6";;
+    4) clear && ./install;;
+        *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
+    esac
+done
 
 clear
+echo "Information You Have Filled:"
+echo "========================================================================="
+echo "Your Domain: $svdomain"
+echo "-------------------------------------------------------------------------"
+echo "Phpmyadmin Port: $svport"
+echo "-------------------------------------------------------------------------"
+echo "PHP Version: $php"
+echo "========================================================================="
+read -r -p "Information Provided Is Accurate ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
 echo "Setup is starting ...."
 
 read -r -p "Use PHP FastCGI ? [y/N] " fastcgi
@@ -258,7 +290,7 @@ yum -y install ImageMagick*
 if [ "$php" = "5.6" ]; then
     yum -y --enablerepo=remi,remi-php56 install php php-curl php-memcached php-memcache php-zts php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
 else if [ "$php" = "5.4" ]; then
-	yum -y --enablerepo=remi,remi-php54 install php php-curl php-memcached php-memcache php-zts php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
+    yum -y --enablerepo=remi,remi-php54 install php php-curl php-memcached php-memcache php-zts php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
 else
     yum -y --enablerepo=remi,remi-php55 install php php-curl php-memcached php-memcache php-zts php-soap php-cli php-snmp php-pspell php-gmp php-bcmath php-intl php-imap perl-LWP-Protocol-https php-pear-Net-SMTP php-enchant php-common php-gd php-devel php-mysql php-pear php-pecl-memcached php-pecl-memcache php-opcache php-pdo php-zlib php-xml php-mbstring php-mcrypt php-xmlrpc php-tidy
 fi
@@ -489,10 +521,10 @@ ServerAlias www.$svdomain
 DocumentRoot /home/$svdomain/public_html
 DirectoryIndex index.html index.htm index.php
 <Directory /home/$svdomain/public_html>
-	Options Indexes FollowSymLinks
-	AllowOverride All
-	Order allow,deny
-	Allow from all
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    Allow from all
 </Directory>
 ErrorLog /home/$svdomain/logs/error.log
 CustomLog /home/$svdomain/logs/access_log combined
@@ -504,10 +536,10 @@ ServerAlias www.$svdomain
 DocumentRoot /home/$svdomain/private_html
 DirectoryIndex index.html index.htm index.php
 <Directory /home/$svdomain/public_html>
-	Options Indexes FollowSymLinks
-	AllowOverride All
-	Order allow,deny
-	Allow from all
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    Allow from all
 </Directory>
 ErrorLog /home/$svdomain/logs/error.log
 CustomLog /home/$svdomain/logs/access_log combined
@@ -1013,3 +1045,13 @@ printf "========================================================================
 sleep 3
 reboot
 exit
+;;
+    *)
+printf "=========================================================================\n"
+        echo "Please choose again..."
+        rm -r -f install && ./install
+        ;;
+esac
+printf "=========================================================================\n"
+        echo "Please choose again..."
+        rm -r -f install && ./install

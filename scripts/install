@@ -135,17 +135,6 @@ fi
 php="5.5";;
 
 clear
-echo "Information You Have Filled:"
-echo "========================================================================="
-echo "Your Domain: $svdomain"
-echo "-------------------------------------------------------------------------"
-echo "Phpmyadmin Port: $svport"
-echo "-------------------------------------------------------------------------"
-echo "PHP Version: $php"
-echo "========================================================================="
-read -r -p "Information Provided Is Accurate ? [y/N] " response
-case $response in
-    [yY][eE][sS]|[yY]) 
 echo "Setup is starting ...."
 
 read -r -p "Use PHP FastCGI ? [y/N] " fastcgi

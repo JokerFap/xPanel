@@ -1,0 +1,143 @@
+#!/bin/bash 
+. /etc/xpanel/xpanel.conf
+
+echo "========================================================================="
+echo -n "Type in domain you want to add to server [ENTER]: " 
+read website
+if [ "$website" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please type in accurately!"
+/etc/xpanel/menu/website/add-website-menu
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$website" =~ $kiemtradomain3 ]]; then
+	website=`echo $website | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$website maybe not a domain name!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+/etc/xpanel/menu/website/menu
+exit
+fi
+
+
+if [ -f /etc/httpd/vhost/$website.conf ]; then
+clear
+echo "========================================================================="
+echo "Discover that $website is existed in the system!"
+/etc/xpanel/menu/website/menu
+exit
+fi
+
+mkdir -p "/home/$website/public_html"
+find "/home/$website/public_html/" -type d -exec chmod 0755 {} \;
+find "/home/$website/public_html/" -type f -exec chmod 0644 {} \;
+mkdir -p "/home/$website/logs"
+cat > "/home/$website/public_html/index.html" <<END
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>Add $website to server successful!</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style type="text/css">
+			/*<![CDATA[*/
+			body {
+				background-color: #fff;
+				color: #000;
+				font-size: 0.9em;
+				font-family: sans-serif,helvetica;
+				margin: 0;
+				padding: 0;
+			}
+		 h1 {
+				text-align: center;
+				margin: 0;
+				padding: 0.6em 2em 0.4em;
+				background-color: #22437f;
+				color: #fff;
+				font-weight: normal;
+				font-size: 1.75em;
+				border-bottom: 2px solid #000;
+			}
+			h1 strong {
+				font-weight: bold;
+			}
+			/*]]>*/
+		</style>
+	</head>
+	<body>
+		<h1><strong>Add $website to server successful!</strong></h1>
+			</body>
+</html>
+END
+
+cat > "/etc/httpd/vhosts/$website.conf" <<END
+<VirtualHost *:8088>
+ServerName tin7.vn
+ServerAlias www.tin7.vn m.tin7.vn
+DocumentRoot /home/tin7/public_html/
+DirectoryIndex index.html index.htm index.php
+<Directory /home/tin/public_html>
+Options Indexes FollowSymLinks
+AllowOverride All
+    Order allow,deny
+    Allow from all
+</Directory>
+ErrorLog logs/www.tin7.error_log
+CustomLog logs/www.tin7.access_log combined
+</VirtualHost>
+END
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service httpd restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart httpd.service
+fi
+IFS='.' read -a array <<< "$website"
+username = ${array[0]}
+password=`date |md5sum |cut -c '14-30'`
+cat > "/tmp/config.temp" <<END
+CREATE DATABASE $username COLLATE utf8_general_ci;
+END
+
+mysql -u root -p$dbpass < /tmp/config.temp
+rm -f /tmp/config.temp
+
+ cat > "/tmp/config.temp" <<END
+CREATE USER '$username'@'localhost' IDENTIFIED BY '$password';
+END
+
+	mysql -u root -p$dbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+    cat > "/tmp/config.temp" <<END
+GRANT ALL PRIVILEGES ON $username . * TO '$username'@'localhost';
+END
+	mysql -u root -p$dbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+    cat > "/tmp/config.temp" <<END
+FLUSH PRIVILEGES;
+END
+	mysql -u root -p$dbpass < /tmp/config.temp
+	rm -f /tmp/config.temp
+
+clear
+echo "========================================================================="
+echo "$website is added successful to server"
+echo "-------------------------------------------------------------------------"
+echo "Upload code to /home/$website/public_html"
+echo "-------------------------------------------------------------------------"
+echo "Database auto created by xPanel for $website :"
+echo "-------------------------------------------------------------------------"
+echo "Database: $dataname"
+echo "User name: $username" 
+echo "Password: $password"
+echo "-------------------------------------------------------------------------"
+
+/etc/xpanel/menu/website/add-website-menu
+exit
+fi

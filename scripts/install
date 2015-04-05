@@ -225,11 +225,13 @@ wget -q http://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}
 unzip release-${NPS_VERSION}-beta.zip
 cd ngx_pagespeed-release-${NPS_VERSION}-beta/
 wget -q http://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz
+rm -rf ./*
 tar -xzvf ${NPS_VERSION}.tar.gz  # extracts to psol/
 cd
 cd /usr/local/xpanel
 #Install nginx
 wget -q http://nginx.org/download/nginx-${Nginx_VERSION}.tar.gz
+rm -rf nginx-${Nginx_VERSION}
 tar -xzf nginx-${Nginx_VERSION}.tar.gz
 cd /usr/local/xpanel/nginx-${Nginx_VERSION}
 sed -i 's/"Server: nginx"/"Server: xPanel"/g' /usr/local/xpanel/nginx-${Nginx_VERSION}/src/http/ngx_http_header_filter_module.c

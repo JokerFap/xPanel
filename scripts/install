@@ -132,7 +132,7 @@ echo "Please try again !"
 ./install
 exit
 fi
-php="5.5";;
+php="5.5"
 
 clear
 echo "Setup is starting ...."

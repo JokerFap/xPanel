@@ -1,0 +1,76 @@
+#!/bin/bash
+
+. /home/vpssim.conf
+echo "========================================================================="
+echo "After remove website, you can not recover it, so be careful"
+echo "-------------------------------------------------------------------------"
+echo -n "Type in website you want to remove [ENTER]: " 
+read website
+
+if [ "$website" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please type in accurately!"
+vpssim
+exit
+fi
+
+if [ "$website" = "$mainsite" ]; then
+clear
+echo "========================================================================="
+echo "You are trying to remove Domain manage on server !!!!"
+echo "-------------------------------------------------------------------------"
+echo "Domain manage can not be deleted"
+vpssim
+exit
+fi
+
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$website" =~ $kiemtradomain3 ]]; then
+	website=`echo $website | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$website maybe not a domain name!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+vpssim
+exit
+fi
+
+
+if [ -f /etc/nginx/conf.d/$website.conf ]; then
+echo "-------------------------------------------------------------------------"
+echo "Discovered $website "
+echo "-------------------------------------------------------------------------"
+read -r -p "You want to remove $website from VPS and delete all data ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+rm -rf /home/$website
+rm -f /etc/nginx/conf.d/$website.conf
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
+service nginx restart
+fi
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
+systemctl restart nginx.service
+fi
+    
+clear
+echo "========================================================================="
+echo "Finished deleting $website "
+vpssim
+        ;;
+    *)
+clear
+echo "========================================================================="
+echo "You do not remove $website "
+vpssim
+        ;;
+esac
+else
+clear
+echo "========================================================================="
+echo "Can not discover $website, Please check it again!!"
+vpssim
+exit
+fi

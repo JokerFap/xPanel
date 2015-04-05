@@ -1,0 +1,66 @@
+#!/bin/bash
+. /etc/xpanel/xpanel.conf
+if [ ! -d "/home/$mainsite/private_html/listwebsite" ]; then
+mkdir -p /home/$mainsite/private_html/listwebsite
+else
+rm -rf /home/$mainsite/private_html/listwebsite/*.*
+fi
+echo "========================================================================="
+echo "This function create list website running on your VPS"
+echo "-------------------------------------------------------------------------"
+read -r -p "You want to view this list ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+    echo "-------------------------------------------------------------------------"
+echo -n "Type in any 5 characters (letters and numbers) [ENTER]: " 
+read listwebsite
+if [ "$listwebsite" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, Please fill accurately. "
+/etc/xpanel/menu/website/add-website-menu
+exit
+fi
+
+if [[ ! ${#listwebsite} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "The security code make your list files more security."
+echo "-------------------------------------------------------------------------"
+echo "It must be at least 5 characters long. Please try again !"
+/etc/xpanel/menu/website/add-website-menu
+exit
+fi  
+echo "-------------------------------------------------------------------------"
+	echo "Please wait.... !"
+	sleep 2
+	cd /etc/nginx/conf.d
+	echo "=========================================================================" > /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+    echo "                             LIST WEBSITE "                         >>/home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+    echo "=========================================================================" >> /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+    echo "Co tat ca $(find /etc/nginx/conf.d -type f | wc -l) website dang chay tren VPS:" >> /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+    echo "" >> /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+	ls >> /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+	sed -i 's/\.conf//g' /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+		echo "=========================================================================" >> /home/$mainsite/private_html/listwebsite/$listwebsite-listsite.txt
+cd
+clear
+echo "========================================================================="
+echo "Link view the list website on VPS:"
+echo "-------------------------------------------------------------------------"
+echo "http://$serverip:$priport/listwebsite/$listwebsite-listsite.txt"
+echo "-------------------------------------------------------------------------"
+echo "http://$mainsite:$priport/listwebsite/$listwebsite-listsite.txt"
+/etc/xpanel/menu/website/add-website-menu
+        ;;
+    *)
+        echo ""
+        ;;
+esac
+clear
+clear
+echo "========================================================================="
+echo "Cancel CREATE list website."
+/etc/xpanel/menu/website/add-website-menu
+exit
+fi

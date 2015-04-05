@@ -1,33 +1,76 @@
-#!/bin/sh
-. /home/vpssim.conf
+#!/bin/bash
+. /etc/xpanel/xpanel.conf
 
+echo "========================================================================="
+echo "After remove website, you can not recover it, so be careful"
+echo "-------------------------------------------------------------------------"
+echo -n "Type in website you want to remove [ENTER]: " 
+read website
+
+if [ "$website" = "" ]; then
+clear
+echo "========================================================================="
+echo "You typed wrong, please type in accurately!"
+xpanel
+exit
+fi
+
+if [ "$website" = "$mainsite" ]; then
+clear
+echo "========================================================================="
+echo "You are trying to remove Domain manage on server !!!!"
+echo "-------------------------------------------------------------------------"
+echo "Domain manage can not be deleted"
+xpanel
+exit
+fi
+
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,14}$";
+if [[ ! "$website" =~ $kiemtradomain3 ]]; then
+	website=`echo $website | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$website maybe not a domain name!"
+echo "-------------------------------------------------------------------------"
+echo "Please try again !"
+xpanel
+exit
+fi
+
+
+if [ -f /etc/httpd/vhost/$website.conf ]; then
+echo "-------------------------------------------------------------------------"
+echo "Discovered $website "
+echo "-------------------------------------------------------------------------"
+read -r -p "You want to remove $website from VPS and delete all data ? [y/N] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+rm -rf /home/$website
+rm -f /etc/httpd/vhost/$website.conf
 if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
-if [ "$(/sbin/service nginx status | awk 'NR==1 {print $5}')" == "running..." ]; then
-/etc/vpssim/menu/vpssim-xoa-website
-else
-clear
-echo "========================================================================="
-echo "Sorry, Nginx is stopped. Please start it before use this function !"
-echo "-------------------------------------------------------------------------"
-echo "You can start Nginx by Command [ service nginx start ]"
-vpssim
-exit
+service httpd restart
 fi
-fi
-
 if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "7" ]; then 
-systemctl start nginx.service
-if [ "$(/bin/systemctl status  nginx.service| awk 'NR==3 {print $2}')" == "active" ]; then
+systemctl restart httpd.service
+fi
+    
 clear
-/etc/vpssim/menu/vpssim-xoa-website
+echo "========================================================================="
+echo "Finished deleting $website "
+xpanel
+        ;;
+    *)
+clear
+echo "========================================================================="
+echo "You do not remove $website "
+xpanel
+        ;;
+esac
 else
 clear
 echo "========================================================================="
-echo "Sorry, Nginx is stopped."
-echo "-------------------------------------------------------------------------"
-echo "Please start it before use this function !"
-vpssim
+echo "Can not discover $website, Please check it again!!"
+xpanel
 exit
 fi
-fi
-

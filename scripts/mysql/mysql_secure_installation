@@ -226,8 +226,8 @@ set_root_password() {
 
     esc_pass=`basic_single_escape "$password1"`
     do_query "UPDATE mysql.user SET Password=PASSWORD('$esc_pass') WHERE User='root';"
-    cat >> "/home/vpssim.conf" <<END
-mariadbpass="$password1"
+    cat >> "/etc/xpanel/xpanel.conf" <<END
+dbpass="$password1"
 END
     if [ $? -eq 0 ]; then
 	echo "Update password successful !"

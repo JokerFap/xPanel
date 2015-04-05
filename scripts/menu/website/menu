@@ -1,10 +1,10 @@
 #!/bin/bash
 prompt="Type in your choice(5-Exit):"
-options=( "Add Website" "List Website Running" "Exit")
+options=( "Add Website" "List Website Running" "Remove Website" "Exit")
 printf "=========================================================================\n"
-printf "               \e[32mxPanel\e[0m - Manage VPS/Server by JokerFap \n"
+printf "               xPanel - Manage VPS/Server by JokerFap \n"
 printf "=========================================================================\n"
-printf "                        Add Website\n"
+printf "                        Website Manager\n"
 printf "=========================================================================\n"
 
 PS3="$prompt"
@@ -13,7 +13,8 @@ select opt in "${options[@]}" ; do
     case "$REPLY" in
     1) /etc/xpanel/menu/website/add-website;;
     2) /etc/xpanel/menu/website/list-website;; 
-    3) clear && xpanel;;
+    3) /etc/xpanel/menu/website/remove-website;; 
+    4) clear && xpanel;;
         *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
     esac
 done

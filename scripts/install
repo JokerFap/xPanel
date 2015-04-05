@@ -144,16 +144,7 @@ printf "========================================================================
 printf "                        Select PHP Version\n"
 printf "=========================================================================\n"
 
-PS3="$prompt"
-select opt in "${options[@]}" ; do 
-    case "$REPLY" in
-    1) php="5.4";;
-    2) php="5.5";;
-    3) php="5.6";;
-    4) clear && ./install;;
-        *) echo "You typed wrong, Please type in the ordinal number on the list";continue;;
-    esac
-done
+php="5.5"
 
 clear
 echo "Information You Have Filled:"

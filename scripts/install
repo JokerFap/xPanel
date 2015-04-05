@@ -135,20 +135,7 @@ echo "Please try again !"
 ./install
 exit
 fi
-
-options=( "PHP 5.4" "PHP 5.5 " "PHP 5.6" "Exit")
-printf "=========================================================================\n"
-printf "               xPanel - Manage VPS/Server by JokerFap \n"
-printf "=========================================================================\n"
-printf "                        Select PHP Version\n"
-printf "=========================================================================\n"
-read -r -p "Select PHP Version" response
-case "$response" in
-1) php="5.4";;
-2) php="5.5";;
-3) php="5.6";;
-*) php="5.5";;
-esac
+php="5.5"
 
 clear
 echo "Information You Have Filled:"
@@ -159,11 +146,6 @@ echo "Phpmyadmin Port: $svport"
 echo "-------------------------------------------------------------------------"
 echo "PHP Version: $php"
 echo "========================================================================="
-read -r -p "Information Provided Is Accurate ? [y/N] " response
-case $response in
-    [yY][eE][sS]|[yY]) 
-echo "Setup is starting ...."
-
 read -r -p "Use PHP FastCGI ? [y/N] " fastcgi
 read -r -p "Use MariaDB ? [y/N] " mariadb
 
@@ -1040,13 +1022,6 @@ printf "========================================================================
 sleep 3
 reboot
 exit
-;;
-    *)
-printf "=========================================================================\n"
-        echo "Please choose again..."
-        rm -r -f install && ./install
-        ;;
-esac
 printf "=========================================================================\n"
         echo "Please choose again..."
         rm -r -f install && ./install
